@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="..\packages\KSPBuildTools.0.0.5\build\KSPBuildTools.props" Condition="Exists('..\packages\KSPBuildTools.0.0.5\build\KSPBuildTools.props')" />
+    <Import Project="..\packages\JsonPoke.1.2.0\build\JsonPoke.props" Condition="Exists('..\packages\JsonPoke.1.2.0\build\JsonPoke.props')" />
+    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{5BE4D793-8C92-424E-BC9B-200FC9EBC4F4}</ProjectGuid>
+        <OutputType>Library</OutputType>
+        <AppDesignerFolder>Properties</AppDesignerFolder>
+        <RootNamespace>kOS.MechJeb.Addon</RootNamespace>
+        <AssemblyName>kOS.MechJeb.Addon</AssemblyName>
+        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+        <FileAlignment>512</FileAlignment>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>/Users/belpyro/Library/Application Support/Steam/steamapps/common/Kerbal Space Program/GameData/KOS.MechJeb</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+    <ItemGroup>        
+      <Reference Include="kOS">
+        <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\GameData\kOS\Plugins\kOS.dll</HintPath>
+        <Private>False</Private>
+      </Reference>        
+      <Reference Include="kOS.Safe, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\GameData\kOS\Plugins\kOS.Safe.dll</HintPath>
+        <Private>False</Private>
+          <SpecificVersion>False</SpecificVersion>
+      </Reference>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="Addon.cs" />
+        <Compile Include="Attributes\ComputedModuleAttribute.cs" />
+        <Compile Include="Attributes\MechJebTypeNameAttribute.cs" />
+        <Compile Include="Core\Constants.cs" />
+        <Compile Include="Core\IBaseWrapper.cs" />
+        <Compile Include="Core\IInfoItemsWrapper.cs" />
+        <Compile Include="Core\IMechJebAscentWrapper.cs" />
+        <Compile Include="Core\IMechJebCoreWrapper.cs" />
+        <Compile Include="Core\IVesselStateWrapper.cs" />
+        <Compile Include="MechJebController.cs" />
+        <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Utils\MechJebBinder.cs" />
+        <Compile Include="Utils\ReflectionUtils.cs" />
+        <Compile Include="Utils\VesselUtils.cs" />
+        <Compile Include="Wrapeers\BaseWrapper.cs" />
+        <Compile Include="Wrapeers\MechJebAscentWrapper.cs" />
+        <Compile Include="Wrapeers\MechJebCoreWrapper.cs" />
+        <Compile Include="Wrapeers\MechJebInfoItemsWrapper.cs" />
+        <Compile Include="Wrapeers\VesselStateWrapper.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="packages.config" />
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+      <PropertyGroup>
+        <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+      </PropertyGroup>
+      <Error Condition="!Exists('..\packages\JsonPoke.1.2.0\build\JsonPoke.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\JsonPoke.1.2.0\build\JsonPoke.props'))" />
+      <Error Condition="!Exists('..\packages\JsonPoke.1.2.0\build\JsonPoke.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\JsonPoke.1.2.0\build\JsonPoke.targets'))" />
+      <Error Condition="!Exists('..\packages\KSPBuildTools.0.0.5\build\KSPBuildTools.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\KSPBuildTools.0.0.5\build\KSPBuildTools.props'))" />
+      <Error Condition="!Exists('..\packages\KSPBuildTools.0.0.5\build\KSPBuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\KSPBuildTools.0.0.5\build\KSPBuildTools.targets'))" />
+    </Target>
+    <Import Project="..\packages\JsonPoke.1.2.0\build\JsonPoke.targets" Condition="Exists('..\packages\JsonPoke.1.2.0\build\JsonPoke.targets')" />
+    <Import Project="..\packages\KSPBuildTools.0.0.5\build\KSPBuildTools.targets" Condition="Exists('..\packages\KSPBuildTools.0.0.5\build\KSPBuildTools.targets')" />
+    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+         Other similar extension points exist, see Microsoft.Common.targets.
+    <Target Name="BeforeBuild">
+    </Target>
+    <Target Name="AfterBuild">
+    </Target>
+    -->
+
+</Project>
