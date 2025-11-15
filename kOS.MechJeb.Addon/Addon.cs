@@ -1,16 +1,15 @@
 using System.Linq;
-using System.Reflection;
 using kOS.AddOns;
-using kOS.MechJeb.Addon.Core;
-using kOS.MechJeb.Addon.Utils;
-using kOS.MechJeb.Addon.Wrapeers;
+using kOS.MechJeb2.Addon.Core;
+using kOS.MechJeb2.Addon.Utils;
+using kOS.MechJeb2.Addon.Wrapeers;
 using kOS.Safe.Encapsulation;
 using kOS.Safe.Encapsulation.Suffixes;
 using kOS.Safe.Utilities;
 
 // ReSharper disable PossibleNullReferenceException
 
-namespace kOS.MechJeb.Addon
+namespace kOS.MechJeb2.Addon
 {
     [kOSAddon("MJ")]
     [KOSNomenclature("MJAddon")]

@@ -9,10 +9,11 @@
         <ProjectGuid>{5BE4D793-8C92-424E-BC9B-200FC9EBC4F4}</ProjectGuid>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>kOS.MechJeb.Addon</RootNamespace>
-        <AssemblyName>kOS.MechJeb.Addon</AssemblyName>
+        <RootNamespace>kOS.MechJeb2.Addon</RootNamespace>
+        <AssemblyName>kOS.MechJeb2.Addon</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
+        <Version>0.0.1</Version>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -23,6 +24,7 @@
         <DefineConstants>DEBUG;TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
+        <Version>0.0.1</Version>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,6 +34,7 @@
         <DefineConstants>TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
+        <Version>0.0.1</Version>
     </PropertyGroup>
     <ItemGroup>        
       <Reference Include="kOS">
@@ -67,6 +70,14 @@
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />
+    </ItemGroup>
+    <!-- Version Files -->
+    <ItemGroup>
+        <KSPVersionFile Include=".">
+            <Destination>$(RepoRootPath)GameData/kOS.MechJeb.Addon/kOS.MechJeb.Addon.version</Destination>
+            <URL>https://github.com/belpyro/kOS.MechJeb2.Addon/releases/latest/download/kOS.MechJeb.Addon.version</URL>
+            <Download>https://github.com/belpyro/kOS.MechJeb2.Addon/releases/latest</Download>
+        </KSPVersionFile>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -1,9 +1,7 @@
-using System;
-using kOS.MechJeb.Addon.Core;
-using kOS.MechJeb.Addon.Wrapeers;
+using kOS.MechJeb2.Addon.Wrapeers;
 using kOS.Safe.Encapsulation;
 
-namespace kOS.MechJeb.Addon
+namespace kOS.MechJeb2.Addon
 {
     public static class MechJebController
     {

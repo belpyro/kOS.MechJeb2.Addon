@@ -1,7 +1,7 @@
 using System;
-using kOS.MechJeb.Addon.Wrapeers;
+using kOS.MechJeb2.Addon.Wrapeers;
 
-namespace kOS.MechJeb.Addon.Core
+namespace kOS.MechJeb2.Addon.Core
 {
     public interface IMechJebCoreWrapper : IBaseWrapper
     {

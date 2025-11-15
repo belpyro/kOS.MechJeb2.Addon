@@ -1,6 +1,6 @@
 using System;
 
-namespace kOS.MechJeb.Addon.Attributes
+namespace kOS.MechJeb2.Addon.Attributes
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property,  AllowMultiple = false, Inherited = true)]
     public class MechJebTypeNameAttribute : Attribute

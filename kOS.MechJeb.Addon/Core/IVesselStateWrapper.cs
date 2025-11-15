@@ -1,7 +1,7 @@
 using System;
 using kOS.Safe.Encapsulation;
 
-namespace kOS.MechJeb.Addon.Core
+namespace kOS.MechJeb2.Addon.Core
 {
     public interface IVesselStateWrapper : IBaseWrapper, ISuffixed
     {

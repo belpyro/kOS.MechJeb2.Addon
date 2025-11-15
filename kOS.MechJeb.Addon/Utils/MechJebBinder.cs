@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using kOS.MechJeb.Addon.Attributes;
-using kOS.MechJeb.Addon.Core;
+using kOS.MechJeb2.Addon.Attributes;
+using kOS.MechJeb2.Addon.Core;
 
-namespace kOS.MechJeb.Addon.Utils
+namespace kOS.MechJeb2.Addon.Utils
 {
     public static class MechJebBinder
     {

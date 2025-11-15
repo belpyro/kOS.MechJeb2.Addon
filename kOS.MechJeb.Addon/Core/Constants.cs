@@ -1,4 +1,4 @@
-namespace kOS.MechJeb.Addon.Core
+namespace kOS.MechJeb2.Addon.Core
 {
     public static class Constants
     {

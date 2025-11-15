@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using kOS.Safe.Exceptions;
 
-namespace kOS.MechJeb.Addon.Utils
+namespace kOS.MechJeb2.Addon.Utils
 {
     public delegate object LateBoundMethod(object target, object[] args);
 

@@ -1,6 +1,6 @@
 using System;
 
-namespace kOS.MechJeb.Addon.Attributes
+namespace kOS.MechJeb2.Addon.Attributes
 {
     public class ComputedModuleAttribute : Attribute
     {

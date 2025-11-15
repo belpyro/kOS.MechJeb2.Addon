@@ -1,12 +1,11 @@
 using System;
-using kOS.MechJeb.Addon.Attributes;
-using kOS.MechJeb.Addon.Core;
-using kOS.MechJeb.Addon.Utils;
+using kOS.MechJeb2.Addon.Core;
+using kOS.MechJeb2.Addon.Utils;
 using kOS.Safe.Encapsulation;
 using kOS.Safe.Encapsulation.Suffixes;
 using kOS.Safe.Utilities;
 
-namespace kOS.MechJeb.Addon.Wrapeers
+namespace kOS.MechJeb2.Addon.Wrapeers
 {
     [KOSNomenclature("AscentWrapper")]
     public class MechJebAscentWrapper : BaseWrapper, IMechJebAscentWrapper
