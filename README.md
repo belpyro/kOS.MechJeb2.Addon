@@ -89,10 +89,11 @@ set asc  to core:ascent.
 
 ### Top-level addon suffixes (`ADDONS:MJ`)
 
-| Suffix     | Type                 | Description                                   |
-|------------|----------------------|-----------------------------------------------|
-| `CORE`     | MechJebCoreWrapper   | Entry point to all MechJeb-related wrappers   |
-| `AVAILABLE`| Boolean              | True if MechJeb is available for this vessel |
+| Suffix      | Type               | Description                                  |
+|-------------|--------------------|----------------------------------------------|
+| `CORE`      | MechJebCoreWrapper | Entry point to all MechJeb-related wrappers  |
+| `AVAILABLE` | Boolean            | True if MechJeb is available for this vessel |
+| `VERSION`   | VersionInfo        | Actual plugin version                        |
 
 ```ks
 set mj to addons:mj.

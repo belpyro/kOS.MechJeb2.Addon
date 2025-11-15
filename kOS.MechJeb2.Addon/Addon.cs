@@ -17,6 +17,7 @@ namespace kOS.MechJeb2.Addon
     {
         private readonly PartModule _mechJebCore;
         private bool _isAvailable;
+        private static readonly VersionInfo _version = new VersionInfo(0, 0, 1, 0);
 
         public Addon(SharedObjects shared) : base(shared)
         {
@@ -32,6 +33,7 @@ namespace kOS.MechJeb2.Addon
         private void InitializeSuffixes()
         {
             this.AddSuffix("CORE", new NoArgsSuffix<MechJebCoreWrapper>(() => MechJebController.Instance));
+            this.AddSuffix("VERSION", new NoArgsSuffix<VersionInfo>(() => _version));
         }
     }
 }
