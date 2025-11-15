@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kOS.MechJeb.Addon", "kOS.MechJeb.Addon\kOS.MechJeb.Addon.csproj", "{5BE4D793-8C92-424E-BC9B-200FC9EBC4F4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kOS.MechJeb2.Addon", "kOS.MechJeb2.Addon\kOS.MechJeb2.Addon.csproj", "{5BE4D793-8C92-424E-BC9B-200FC9EBC4F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

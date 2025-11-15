@@ -1,0 +1,9 @@
+{
+  "NAME": "kOS.MechJeb2.Addon",
+  "VERSION": "",
+  "URL": "https://github.com/belpyro/kOS.MechJeb2.Addon/releases/latest/download/kOS.MechJeb2.Addon.version",
+  "DOWNLOAD": "https://github.com/belpyro/kOS.MechJeb2.Addon/releases/latest",
+  "KSP_VERSION": "1.12",
+  "KSP_VERSION_MIN": "1.8",
+  "KSP_VERSION_MAX": "1.12"
+}
