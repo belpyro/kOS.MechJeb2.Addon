@@ -1,4 +1,4 @@
-# 🚀 kOS.MechJeb.Addon
+# 🚀 kOS.MechJeb2.Addon
 
 **Integration layer between kOS and MechJeb2**
 
