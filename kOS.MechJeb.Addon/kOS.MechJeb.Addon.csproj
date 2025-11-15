@@ -19,7 +19,7 @@
         <DebugSymbols>true</DebugSymbols>
         <DebugType>full</DebugType>
         <Optimize>false</Optimize>
-        <OutputPath>/Users/belpyro/Library/Application Support/Steam/steamapps/common/Kerbal Space Program/GameData/KOS.MechJeb</OutputPath>
+        <OutputPath>bin\Debug\</OutputPath>
         <DefineConstants>DEBUG;TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
@@ -35,11 +35,11 @@
     </PropertyGroup>
     <ItemGroup>        
       <Reference Include="kOS">
-        <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\GameData\kOS\Plugins\kOS.dll</HintPath>
+        <HintPath>..\References\kOS.dll</HintPath>
         <Private>False</Private>
       </Reference>        
       <Reference Include="kOS.Safe, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\GameData\kOS\Plugins\kOS.Safe.dll</HintPath>
+        <HintPath>..\References\kOS.Safe.dll</HintPath>
         <Private>False</Private>
           <SpecificVersion>False</SpecificVersion>
       </Reference>
