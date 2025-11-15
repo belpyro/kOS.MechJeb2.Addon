@@ -13,7 +13,6 @@
         <AssemblyName>kOS.MechJeb2.Addon</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
-        <Version>0.0.1</Version>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -24,7 +23,6 @@
         <DefineConstants>DEBUG;TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
-        <Version>0.0.1</Version>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,7 +32,6 @@
         <DefineConstants>TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
-        <Version>0.0.1</Version>
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="kOS">
@@ -77,6 +74,7 @@
             <Destination>$(RepoRootPath)GameData/kOS.MechJeb2.Addon/kOS.MechJeb2.Addon.version</Destination>
             <URL>https://github.com/belpyro/kOS.MechJeb2.Addon/releases/latest/download/kOS.MechJeb2.Addon.version</URL>
             <Download>https://github.com/belpyro/kOS.MechJeb2.Addon/releases/latest</Download>
+            <Version>0.0.1</Version>            
         </KSPVersionFile>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
