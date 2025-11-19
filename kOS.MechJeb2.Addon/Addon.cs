@@ -1,6 +1,7 @@
 using System.Linq;
 using kOS.AddOns;
 using kOS.MechJeb2.Addon.Core;
+using kOS.MechJeb2.Addon.Helpers;
 using kOS.MechJeb2.Addon.Utils;
 using kOS.MechJeb2.Addon.Wrapeers;
 using kOS.Safe.Encapsulation;
@@ -33,6 +34,7 @@ namespace kOS.MechJeb2.Addon
         private void InitializeSuffixes()
         {
             this.AddSuffix("CORE", new NoArgsSuffix<MechJebCoreWrapper>(() => MechJebController.Instance));
+            this.AddSuffix(new []{"OBTHELPER", "ORBITHELPER", "OBTHLP"}, new NoArgsSuffix<OrbitalCalculatorHelper>(() => OrbitalCalculatorHelper.Instance));
             this.AddSuffix("VERSION", new NoArgsSuffix<VersionInfo>(() => _version));
         }
     }

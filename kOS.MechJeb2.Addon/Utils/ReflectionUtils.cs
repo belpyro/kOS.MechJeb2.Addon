@@ -207,5 +207,106 @@ namespace kOS.MechJeb2.Addon.Utils
             var lambda = Expression.Lambda<Func<object, float>>(body, objParam);
             return lambda.Compile();
         }
+
+        public static Func<object[], object> MakeStaticMethodWithArgs(this MethodInfo method)
+        {
+            if (method == null) throw new ArgumentNullException(nameof(method));
+            if (!method.IsStatic)
+                throw new NotSupportedException("MakeStaticMethodWithArgs supports only static methods.");
+
+            var argsInfo = method.GetParameters();
+            var arrParam = Expression.Parameter(typeof(object[]), "args");
+
+            var locals = new List<ParameterExpression>();
+            var callArgs = new List<Expression>();
+            var outVars = new List<ParameterExpression>();
+
+            // Разбираем параметры метода
+            for (int i = 0; i < argsInfo.Length; i++)
+            {
+                var p = argsInfo[i];
+
+                if (p.IsOut)
+                {
+                    var elementType = p.ParameterType.GetElementType()
+                                      ?? throw new InvalidOperationException("Out parameter has no element type.");
+                    var varExpr = Expression.Variable(elementType, p.Name ?? ("out" + i));
+                    locals.Add(varExpr);
+                    outVars.Add(varExpr);
+                    callArgs.Add(varExpr); // ref/out передаём саму переменную
+                }
+                else
+                {
+                    var index = Expression.Constant(i);
+                    var access = Expression.ArrayIndex(arrParam, index);
+                    var cast = Expression.Convert(access, p.ParameterType);
+                    callArgs.Add(cast);
+                }
+            }
+
+            if (outVars.Count > 1)
+                throw new NotSupportedException("Only methods with 0 or 1 out parameter are supported.");
+
+            var callExpr = Expression.Call(method, callArgs);
+
+            Expression body;
+
+            // Случай 0: нет out-параметров
+            if (outVars.Count == 0)
+            {
+                if (method.ReturnType == typeof(void))
+                {
+                    // { call; return null; }
+                    body = Expression.Block(
+                        callExpr,
+                        Expression.Constant(null, typeof(object))
+                    );
+                }
+                else
+                {
+                    // { return (object) call; }
+                    body = Expression.Convert(callExpr, typeof(object));
+                }
+
+                return Expression.Lambda<Func<object[], object>>(body, arrParam).Compile();
+            }
+
+            // Тут outVars.Count == 1
+            var outVar = outVars[0];
+
+            // Случай 1: есть out, но метод void → как раньше: возвращаем только out
+            if (method.ReturnType == typeof(void))
+            {
+                // { TOut outVar; call; return (object)outVar; }
+                body = Expression.Block(
+                    locals,
+                    callExpr,
+                    Expression.Convert(outVar, typeof(object))
+                );
+
+                return Expression.Lambda<Func<object[], object>>(body, arrParam).Compile();
+            }
+
+            // Случай 2: есть out и есть результат → возвращаем (result, outVar) как ValueTuple
+            var resultVar = Expression.Variable(method.ReturnType, "result");
+            locals.Insert(0, resultVar); // чтобы result тоже был локалом
+
+            var assignResult = Expression.Assign(resultVar, callExpr);
+
+            var tupleType = typeof(ValueTuple<,>).MakeGenericType(method.ReturnType, outVar.Type);
+            var ctor = tupleType.GetConstructor(new[] { method.ReturnType, outVar.Type })
+                       ?? throw new InvalidOperationException("Tuple constructor not found.");
+
+            var newTuple = Expression.New(ctor, resultVar, outVar);
+            var boxedTuple = Expression.Convert(newTuple, typeof(object));
+
+            body = Expression.Block(
+                locals,
+                assignResult,
+                boxedTuple
+            );
+
+            return Expression.Lambda<Func<object[], object>>(body, arrParam).Compile();
+        }
     }
 }
