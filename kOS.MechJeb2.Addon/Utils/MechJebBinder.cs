@@ -46,7 +46,7 @@ namespace kOS.MechJeb2.Addon.Utils
 
                 if (typeof(Delegate).IsAssignableFrom(wrapperPropType))
                 {
-                    var del = coreMember.BuildTypedGetter(); // Func<object,bool>/double/... как у тебя
+                    var del = coreMember.BuildTypedGetter();
                     wrapperProp.SetValue(wrapper, del, null);
                     continue;
                 }
