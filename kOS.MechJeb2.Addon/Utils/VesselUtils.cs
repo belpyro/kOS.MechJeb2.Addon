@@ -13,7 +13,7 @@ namespace kOS.MechJeb2.Addon.Utils
                     m.ClassName.Equals(moduleTypeName, StringComparison.OrdinalIgnoreCase))
                 .ToArray();
         
-        public static object GetComputedModule(object coreInstance, string attrModuleName)
+        public static object GetComputedModule(this object coreInstance, string attrModuleName)
         {
             var getCompModule = coreInstance.GetType().GetMethodInvoker(Constants.GetComputerModuleMethod,
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase, typeof(string));
