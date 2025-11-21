@@ -14,6 +14,8 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         private object _coreModule;
         private object _ascentSettings;
         private object _stagingController;
+        private object _thrustController;
+        private object _nodeExecutor;
 
         public override void Initialize(object coreInstance)
         {
@@ -27,6 +29,8 @@ namespace kOS.MechJeb2.Addon.Wrapeers
             _coreModule = Member(CoreInstance, "Core").GetField<object>()(CoreInstance);
             _ascentSettings = Member(_coreModule, "AscentSettings").GetField<object>()(_coreModule);
             _stagingController = Member(_coreModule, "Staging").GetField<object>()(_coreModule);
+            _thrustController = Member(_coreModule, "Thrust").GetField<object>()(_coreModule);
+            _nodeExecutor = Member(_coreModule, "Node").GetField<object>()(_coreModule);
 
             GetEnabled = Member(CoreInstance, nameof(Enabled)).GetProp<bool>();
             SetEnabled = Member(CoreInstance, nameof(Enabled)).SetProp<bool>();
@@ -120,10 +124,16 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                 BindEditable<double>(_ascentSettings, "AOALimitFadeoutPressure");
 
             (GetLimitQaDouble, SetLimitQa) =
-                BindEditable<double>(_ascentSettings, "LimitQa");
+                BindEditable<double>(_thrustController,"MaxDynamicPressure");
 
-            GetLimitQaEnabled = Member(_ascentSettings, "LimitQaEnabled").GetField<bool>();
-            SetLimitQaEnabled = Member(_ascentSettings, "LimitQaEnabled").SetField<bool>();
+            GetLimitQaEnabled = Member(_thrustController, "LimitDynamicPressure").GetField<bool>();
+            SetLimitQaEnabled = Member(_thrustController, "LimitDynamicPressure").SetField<bool>();
+            
+            GetLimitToPreventOverheats = Member(_thrustController, "LimitToPreventOverheats").GetField<bool>();
+            SetLimitToPreventOverheats = Member(_thrustController, "LimitToPreventOverheats").SetField<bool>();
+            
+            GetAutoWarp =  Member(_nodeExecutor, "AutoWarp").GetField<bool>();
+            SetAutoWarp =  Member(_nodeExecutor, "AutoWarp").SetField<bool>();
         }
 
         private void InitializeSuffixes()
@@ -310,15 +320,29 @@ namespace kOS.MechJeb2.Addon.Wrapeers
 
             AddSuffix(new[] { "LIMITQA", "LIMQA" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetLimitQaDouble(_ascentSettings),
-                    value => SetLimitQa(_ascentSettings, value),
+                    () => GetLimitQaDouble(_thrustController),
+                    value => SetLimitQa(_thrustController, value),
                     "Dynamic pressure limit (Q)"));
 
             AddSuffix(new[] { "LIMITQAENABLED", "LIMQAEN" },
                 new SetSuffix<BooleanValue>(
-                    () => GetLimitQaEnabled(_ascentSettings),
-                    value => SetLimitQaEnabled(_ascentSettings, value),
+                    () => GetLimitQaEnabled(_thrustController),
+                    value => SetLimitQaEnabled(_thrustController, value),
                     "Enable dynamic pressure limit (Q)"));
+            
+            // --- Thrust controller safety limits ---
+            AddSuffix(new[] { "LIMITTOPREVENTOVERHEATS", "LIMOVHT" },
+                new SetSuffix<BooleanValue>(
+                    () => GetLimitToPreventOverheats(_thrustController),
+                    value => SetLimitToPreventOverheats(_thrustController, value),
+                    "Limit thrust to prevent engine overheating"));
+
+            // --- Node executor auto-warp ---
+            AddSuffix(new[] { "AUTOWARP", "AWARP" },
+                new SetSuffix<BooleanValue>(
+                    () => GetAutoWarp(_nodeExecutor),
+                    value => SetAutoWarp(_nodeExecutor, value),
+                    "Enable automatic time warp for maneuver execution"));
         }
 
         public BooleanValue Enabled
@@ -333,6 +357,7 @@ namespace kOS.MechJeb2.Addon.Wrapeers
             }
         }
 
+
         public int AscentType => GetAscentTypeInteger(_ascentSettings);
 
         private Func<object, bool> GetEnabled { get; set; }
@@ -346,6 +371,10 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         private Action<object, bool> SetAutoPath { get; set; }
 
         private Func<object, int> GetAscentTypeInteger { get; set; }
+
+        public Action<object, bool> SetAutoWarp { get; set; }
+
+        public Func<object, bool> GetAutoWarp { get; set; }
 
         //Autostage
         private Func<object, bool> GetAutostage { get; set; }
@@ -466,6 +495,10 @@ namespace kOS.MechJeb2.Addon.Wrapeers
 
         private Func<object, bool> GetLimitQaEnabled { get; set; }
         private Action<object, bool> SetLimitQaEnabled { get; set; }
+        
+        //LimitToPreventOverheats
+        private Func<object, bool> GetLimitToPreventOverheats { get; set; }
+        private Action<object, bool> SetLimitToPreventOverheats { get; set; }
 
         //Helpers
         private (Func<object, T> get, Action<object, T> set)
