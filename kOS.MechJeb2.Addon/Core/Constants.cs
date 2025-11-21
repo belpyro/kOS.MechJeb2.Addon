@@ -2,6 +2,7 @@ namespace kOS.MechJeb2.Addon.Core
 {
     public static class Constants
     {
+        public static readonly string EditableDoubleValueName = "Val";
         public static readonly string MechjebAssemblyName = "MechJeb2";
         public static readonly string MechjebCoreName = "MuMech.MechJebCore";
         
