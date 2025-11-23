@@ -10,13 +10,9 @@ namespace kOS.MechJeb2.Addon.Wrapeers
     [KOSNomenclature("VesselStateWrapper")]
     public class VesselStateWrapper : BaseWrapper, IVesselStateWrapper
     {
-        public override void Initialize(object coreInstance)
+        protected override void BindObject()
         {
-            if (Initialized) return;
-
-            base.Initialize(coreInstance);
-
-            var coreType = coreInstance.GetType();
+            var coreType = CoreInstance.GetType();
             const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase;
             var members = coreType.GetMembers(flags)
                 .Where(m => m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property)
@@ -35,11 +31,9 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                 var del = member.BuildDoubleGetter();
                 wrapperProp.SetValue(this, del, null);
             }
-
-            RegisterInitializer(InitializeSuffixes);
         }
 
-        private void InitializeSuffixes()
+        protected override void InitializeSuffixes()
         {
             // Time & gravity
             AddSufixInternal("TIME", Time, "Universal time in seconds", "T");

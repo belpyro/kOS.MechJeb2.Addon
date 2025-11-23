@@ -207,5 +207,20 @@ namespace kOS.MechJeb2.Addon.Utils
             var lambda = Expression.Lambda<Func<object, float>>(body, objParam);
             return lambda.Compile();
         }
+        
+        public static bool IsMechJebDevBuild(this Assembly mjAssembly)
+        {
+            var attr = mjAssembly
+                .GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)
+                .Cast<AssemblyInformationalVersionAttribute>()
+                .FirstOrDefault();
+
+            if (attr == null)
+                return false;
+
+            var info = attr.InformationalVersion.ToLower() ?? "";
+
+            return info.Contains("Dev".ToLower());
+        }
     }
 }

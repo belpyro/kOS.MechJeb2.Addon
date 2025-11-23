@@ -17,13 +17,6 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         private object _thrustController;
         private object _nodeExecutor;
 
-        public override void Initialize(object coreInstance)
-        {
-            if (Initialized) return;
-            base.Initialize(coreInstance);
-            RegisterInitializer(InitializeSuffixes);
-        }
-
         protected override void BindObject()
         {
             _coreModule = Member(CoreInstance, "Core").GetField<object>()(CoreInstance);
@@ -136,7 +129,7 @@ namespace kOS.MechJeb2.Addon.Wrapeers
             SetAutoWarp =  Member(_nodeExecutor, "AutoWarp").SetField<bool>();
         }
 
-        private void InitializeSuffixes()
+        protected override void InitializeSuffixes()
         {
             AddSuffix("ENABLED",
                 new SetSuffix<BooleanValue>(() => Enabled, value => Enabled = value, "Is Ascent autopilot enable?"));

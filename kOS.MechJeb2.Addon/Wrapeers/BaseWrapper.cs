@@ -16,8 +16,9 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         {
             if (Initialized) return;
             CoreInstance = coreInstance;
-            Initialized = true;
             BindObject();
+            RegisterInitializer(InitializeSuffixes);
+            Initialized = true;
         }
         
         protected void AddSufixInternal(string name, Func<object, double> getter, string description,
@@ -72,5 +73,7 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         }
         
         protected virtual void BindObject(){}
+        
+        protected abstract void InitializeSuffixes();
     }
 }

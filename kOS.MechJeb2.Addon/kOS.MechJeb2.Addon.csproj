@@ -80,6 +80,9 @@
             <Version>0.0.1</Version>            
         </KSPVersionFile>
     </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="MSBuild.Version.Target" Version="4.0.150" />
+    </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
         <PropertyGroup>

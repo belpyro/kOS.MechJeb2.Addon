@@ -140,16 +140,12 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         private static readonly System.Collections.Generic.Dictionary<MethodInfo, Delegate> _methodCache =
             new System.Collections.Generic.Dictionary<MethodInfo, Delegate>();
 
-        public override void Initialize(object coreInstance)
+        protected override void BindObject()
         {
-            if (Initialized) return;
-            base.Initialize(coreInstance);
-
-            BindInfoItems(coreInstance.GetType());
-            RegisterInitializer(InitializeSuffixes);
+             BindInfoItems(CoreInstance.GetType());
         }
 
-        private void InitializeSuffixes()
+        protected override void InitializeSuffixes()
         {
             // ===== Maneuver / Node =====
             AddSufixInternal("NEXTMANEUVERNODEBURNTIME", NextManeuverNodeBurnTime, "Burn time for next maneuver node", "BURN");
