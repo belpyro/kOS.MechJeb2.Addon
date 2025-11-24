@@ -19,6 +19,7 @@ namespace kOS.MechJeb2.Addon
         private PartModule _mechJebCore;
         private bool _isCoreInitialized = false;
         private static readonly VersionInfo _version = new(0, 0, 1, 0);
+        private bool? _isMechJebDev;
 
         public Addon(SharedObjects shared) : base(shared)
         {
@@ -29,7 +30,8 @@ namespace kOS.MechJeb2.Addon
         public override BooleanValue Available()
         {
             if (!_isCoreInitialized) TryInitializeMechJebCore();
-            return (bool)MechJebController.IsAvailable && _mechJebCore.GetType().Assembly.IsMechJebDevBuild();
+            _isMechJebDev ??= _mechJebCore.GetType().Assembly.IsMechJebDevBuild();
+            return (bool)MechJebController.IsAvailable && (bool)_isMechJebDev;
         }
 
         private void InitializeSuffixes()
