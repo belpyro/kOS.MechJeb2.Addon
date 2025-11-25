@@ -48,7 +48,6 @@
     <ItemGroup>
         <Compile Include="Addon.cs"/>
         <Compile Include="Attributes\ComputedModuleAttribute.cs"/>
-        <Compile Include="Attributes\LogAttribute.cs" />
         <Compile Include="Attributes\MechJebTypeNameAttribute.cs"/>
         <Compile Include="Core\Constants.cs"/>
         <Compile Include="Core\IBaseWrapper.cs"/>
@@ -82,17 +81,16 @@
         </KSPVersionFile>
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="Emisand.MethodBoundaryAspect.Fody" Version="2.1.1" />
       <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-        <PackageReference Include="ILMerge.Fody" Version="1.24.0" >
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
     </ItemGroup>
     <ItemGroup>
       <Content Include="GitVersion.yml" />
+    </ItemGroup>
+    <ItemGroup>
+      <ReferencePathWithRefAssemblies Update="\Users\belpyro\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\System.Core.dll" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

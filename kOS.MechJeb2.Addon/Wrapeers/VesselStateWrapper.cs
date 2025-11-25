@@ -8,7 +8,7 @@ using kOS.Safe.Utilities;
 
 namespace kOS.MechJeb2.Addon.Wrapeers
 {
-    [KOSNomenclature("VesselStateWrapper"), Log]
+    [KOSNomenclature("VesselStateWrapper")]
     public class VesselStateWrapper : BaseWrapper, IVesselStateWrapper
     {
         protected override void BindObject()

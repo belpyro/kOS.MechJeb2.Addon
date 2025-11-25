@@ -7,7 +7,7 @@ using kOS.Safe.Utilities;
 
 namespace kOS.MechJeb2.Addon.Wrapeers
 {
-    [KOSNomenclature("InfoWrapper"), Log]
+    [KOSNomenclature("InfoWrapper")]
     public sealed class MechJebInfoItemsWrapper : BaseWrapper, IMechJebInfoItemsWrapper
     {
         // Maneuver node / orbit misc

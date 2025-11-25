@@ -8,7 +8,7 @@ using kOS.Safe.Utilities;
 
 namespace kOS.MechJeb2.Addon.Wrapeers
 {
-    [KOSNomenclature("CoreWrapper"), Log]
+    [KOSNomenclature("CoreWrapper")]
     public class MechJebCoreWrapper : BaseWrapper, IMechJebCoreWrapper
     {
         public MechJebAscentWrapper Ascent { get; } = new MechJebAscentWrapper();
