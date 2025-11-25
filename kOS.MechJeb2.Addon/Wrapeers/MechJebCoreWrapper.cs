@@ -8,7 +8,7 @@ using kOS.Safe.Utilities;
 
 namespace kOS.MechJeb2.Addon.Wrapeers
 {
-    [KOSNomenclature("CoreWrapper")]
+    [KOSNomenclature("CoreWrapper"), Log]
     public class MechJebCoreWrapper : BaseWrapper, IMechJebCoreWrapper
     {
         public MechJebAscentWrapper Ascent { get; } = new MechJebAscentWrapper();
@@ -32,5 +32,7 @@ namespace kOS.MechJeb2.Addon.Wrapeers
             this.AddSuffix(new[] { "INFO" }, new NoArgsSuffix<MechJebInfoItemsWrapper>(() => InfoItems));
             this.AddSuffix(new[] { "RUNNING" }, new NoArgsSuffix<BooleanValue>(() => Running(CoreInstance)));
         }
+
+        public override string context() => nameof(MechJebCoreWrapper);
     }
 }

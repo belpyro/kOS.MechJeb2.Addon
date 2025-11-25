@@ -1,12 +1,13 @@
 using System;
 using System.Reflection;
+using kOS.MechJeb2.Addon.Attributes;
 using kOS.MechJeb2.Addon.Core;
 using kOS.MechJeb2.Addon.Utils;
 using kOS.Safe.Utilities;
 
 namespace kOS.MechJeb2.Addon.Wrapeers
 {
-    [KOSNomenclature("InfoWrapper")]
+    [KOSNomenclature("InfoWrapper"), Log]
     public sealed class MechJebInfoItemsWrapper : BaseWrapper, IMechJebInfoItemsWrapper
     {
         // Maneuver node / orbit misc
@@ -239,6 +240,8 @@ namespace kOS.MechJeb2.Addon.Wrapeers
             AddSufixInternal("TOTALDVATM", (Delegate)TotalDeltaVAtmosphere, "Total ΔV atmosphere", "TDVATM");
             AddSufixInternal("TOTALDVATMVAC", TotalDeltaVAtmosphereAndVac, "Formatted total ΔV atm/vac", "TDVSTR");
         }
+
+        public override string context() => nameof(MechJebInfoItemsWrapper);
 
         private void BindInfoItems(Type coreType)
         {

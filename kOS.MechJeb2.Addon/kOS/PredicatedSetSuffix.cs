@@ -2,7 +2,6 @@ using System;
 using kOS.Safe.Encapsulation;
 using kOS.Safe.Encapsulation.Suffixes;
 using kOS.Safe.Exceptions;
-using kOS.Safe.Utilities;
 
 namespace kOS.MechJeb2.Addon.kOS
 {

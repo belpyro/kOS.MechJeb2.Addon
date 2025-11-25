@@ -1,4 +1,5 @@
 using System;
+using kOS.MechJeb2.Addon.Attributes;
 using kOS.MechJeb2.Addon.Core;
 using kOS.MechJeb2.Addon.Utils;
 using kOS.Safe.Encapsulation;
@@ -8,7 +9,7 @@ using kOS.Safe.Utilities;
 
 namespace kOS.MechJeb2.Addon.Wrapeers
 {
-    [KOSNomenclature("AscentWrapper")]
+    [KOSNomenclature("AscentWrapper"), Log]
     public class MechJebAscentWrapper : BaseWrapper, IMechJebAscentWrapper
     {
         private object _coreModule;
@@ -337,6 +338,8 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                     value => SetAutoWarp(_nodeExecutor, value),
                     "Enable automatic time warp for maneuver execution"));
         }
+
+        public override string context() => nameof(MechJebAscentWrapper);
 
         public BooleanValue Enabled
         {
