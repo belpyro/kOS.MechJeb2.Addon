@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using kOS.Safe.Encapsulation;
 using kOS.Safe.Exceptions;
 
 namespace kOS.MechJeb2.Addon.Utils
@@ -221,6 +222,15 @@ namespace kOS.MechJeb2.Addon.Utils
             var info = attr.InformationalVersion.ToLower() ?? "";
 
             return info.Contains("Dev".ToLower());
+        }
+
+        public static VersionInfo GetGitVersionInfo()
+        {
+            var type = typeof(ReflectionUtils).Assembly.GetType("GitVersionInformation");
+            var major = type.GetField("Major", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Static)?.GetValue(null);
+            var minor = type.GetField("Minor", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Static)?.GetValue(null);
+            var patch = type.GetField("Patch", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Static)?.GetValue(null);
+            return new VersionInfo(int.Parse(major.ToString()), int.Parse(minor.ToString()), int.Parse(patch.ToString()),0);
         }
     }
 }

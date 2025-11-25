@@ -20,7 +20,6 @@ namespace kOS.MechJeb2.Addon
     {
         private PartModule _mechJebCore;
         private bool _isCoreInitialized = false;
-        private static readonly VersionInfo _version = new(0, 0, 1, 0);
         private bool? _isMechJebDev;
 
         public Addon(SharedObjects shared) : base(shared)
@@ -52,7 +51,7 @@ namespace kOS.MechJeb2.Addon
                 new OneArgsSuffix<BooleanValue>((val) => TryInitializeMechJebCore(val),
                     "Manually (re)initializes the MechJeb core wrapper. Pass TRUE to force reinitialization."));
             this.AddSuffix("VERSION",
-                new NoArgsSuffix<VersionInfo>(() => _version,
+                new NoArgsSuffix<VersionInfo>(ReflectionUtils.GetGitVersionInfo,
                     "Returns the kOS.MechJeb2.Addon version (major.minor.patch.build)."));
         }
 
