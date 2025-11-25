@@ -89,11 +89,12 @@ set asc  to core:ascent.
 
 ### Top-level addon suffixes (`ADDONS:MJ`)
 
-| Suffix      | Type               | Description                                  |
-|-------------|--------------------|----------------------------------------------|
-| `CORE`      | MechJebCoreWrapper | Entry point to all MechJeb-related wrappers  |
-| `AVAILABLE` | Boolean            | True if MechJeb is available for this vessel |
-| `VERSION`   | VersionInfo        | Actual plugin version                        |
+| Suffix      | Type               | Description                                                                 |
+|-------------|--------------------|-----------------------------------------------------------------------------|
+| `CORE`      | MechJebCoreWrapper | Entry point to all MechJeb-related wrappers                                |
+| `INIT`      | Bool / Function    | Manually (re)initializes MechJeb integration. Optional bool argument forces reinit. |
+| `AVAILABLE` | Boolean            | True if MechJeb is available for this vessel                               |
+| `VERSION`   | VersionInfo        | Actual plugin version                                                        |
 
 ```ks
 set mj to addons:mj.
@@ -104,6 +105,12 @@ if not mj:available {
 
 set core to mj:core.
 ```
+
+### Important limitations
+
+- The addon assumes **exactly one MechJeb core module in RUNNING state per vessel**.
+- If multiple MechJebCore modules are present and running on the same vessel, the addon will **refuse to initialize** and `ADDONS:MJ:AVAILABLE` will be `FALSE`.
+- If you use multiple MechJeb parts on a single craft, make sure that only one of them has an active core before using this addon.
 
 ---
 
