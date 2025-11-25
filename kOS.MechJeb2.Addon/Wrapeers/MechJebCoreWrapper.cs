@@ -20,21 +20,19 @@ namespace kOS.MechJeb2.Addon.Wrapeers
 
         public Func<object, bool> Running { get; internal set; }
 
-        public override void Initialize(object coreInstance)
+        protected override void BindObject()
         {
-            if (Initialized) return;
-            base.Initialize(coreInstance);
-
-            this.BindCoreWrapper(coreInstance);
-            RegisterInitializer(InitializeSuffixes);
+            this.BindCoreWrapper(CoreInstance);
         }
 
-        private void InitializeSuffixes()
+        protected override void InitializeSuffixes()
         {
             this.AddSuffix(new[] { "VESSEL", "VESSELINFO" }, new NoArgsSuffix<VesselStateWrapper>(() => VesselState));
             this.AddSuffix(new[] { "ASCENT", "ASCENTGUIDANCE" }, new NoArgsSuffix<MechJebAscentWrapper>(() => Ascent));
             this.AddSuffix(new[] { "INFO" }, new NoArgsSuffix<MechJebInfoItemsWrapper>(() => InfoItems));
             this.AddSuffix(new[] { "RUNNING" }, new NoArgsSuffix<BooleanValue>(() => Running(CoreInstance)));
         }
+
+        public override string context() => nameof(MechJebCoreWrapper);
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using kOS.Safe.Encapsulation;
 
 namespace kOS.MechJeb2.Addon.Core

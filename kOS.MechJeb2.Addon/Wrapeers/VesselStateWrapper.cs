@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using kOS.MechJeb2.Addon.Attributes;
 using kOS.MechJeb2.Addon.Core;
 using kOS.MechJeb2.Addon.Utils;
 using kOS.Safe.Utilities;
@@ -10,23 +11,17 @@ namespace kOS.MechJeb2.Addon.Wrapeers
     [KOSNomenclature("VesselStateWrapper")]
     public class VesselStateWrapper : BaseWrapper, IVesselStateWrapper
     {
-        public override void Initialize(object coreInstance)
+        protected override void BindObject()
         {
-            if (Initialized) return;
-
-            base.Initialize(coreInstance);
-
-            var coreType = coreInstance.GetType();
+            var coreType = CoreInstance.GetType();
             const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase;
             var members = coreType.GetMembers(flags)
                 .Where(m => m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property)
                 .Where(m => m.HasAttributeNamed("ValueInfoItemAttribute"))
                 .ToArray();
 
-            // Собираем все поля и свойства с атрибутом ValueInfoItem
             foreach (var member in members)
             {
-                // Ищем соответствующее свойство в враппере по имени
                 var wrapperProp = GetType().GetProperty(member.Name, flags);
                 if (wrapperProp == null)
                     continue;
@@ -35,11 +30,9 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                 var del = member.BuildDoubleGetter();
                 wrapperProp.SetValue(this, del, null);
             }
-
-            RegisterInitializer(InitializeSuffixes);
         }
 
-        private void InitializeSuffixes()
+        protected override void InitializeSuffixes()
         {
             // Time & gravity
             AddSufixInternal("TIME", Time, "Universal time in seconds", "T");
@@ -127,6 +120,8 @@ namespace kOS.MechJeb2.Addon.Wrapeers
             AddSufixInternal("PUREDRAG", PureDrag, "Net drag force magnitude (kN)", "DRAG");
             AddSufixInternal("PURELIFT", PureLift, "Net lift force magnitude (kN)", "LIFT");
         }
+
+        public override string context() => nameof(VesselStateWrapper);
 
         public Func<object, double> Time { get; internal set; }
         public Func<object, double> LocalG { get; internal set; }

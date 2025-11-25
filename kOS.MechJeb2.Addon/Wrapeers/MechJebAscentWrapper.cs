@@ -1,4 +1,5 @@
 using System;
+using kOS.MechJeb2.Addon.Attributes;
 using kOS.MechJeb2.Addon.Core;
 using kOS.MechJeb2.Addon.Utils;
 using kOS.Safe.Encapsulation;
@@ -16,13 +17,6 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         private object _stagingController;
         private object _thrustController;
         private object _nodeExecutor;
-
-        public override void Initialize(object coreInstance)
-        {
-            if (Initialized) return;
-            base.Initialize(coreInstance);
-            RegisterInitializer(InitializeSuffixes);
-        }
 
         protected override void BindObject()
         {
@@ -136,7 +130,7 @@ namespace kOS.MechJeb2.Addon.Wrapeers
             SetAutoWarp =  Member(_nodeExecutor, "AutoWarp").SetField<bool>();
         }
 
-        private void InitializeSuffixes()
+        protected override void InitializeSuffixes()
         {
             AddSuffix("ENABLED",
                 new SetSuffix<BooleanValue>(() => Enabled, value => Enabled = value, "Is Ascent autopilot enable?"));
@@ -344,6 +338,8 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                     value => SetAutoWarp(_nodeExecutor, value),
                     "Enable automatic time warp for maneuver execution"));
         }
+
+        public override string context() => nameof(MechJebAscentWrapper);
 
         public BooleanValue Enabled
         {

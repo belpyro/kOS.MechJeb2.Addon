@@ -3,21 +3,23 @@ using kOS.MechJeb2.Addon.Core;
 using kOS.Safe.Encapsulation;
 using kOS.Safe.Encapsulation.Suffixes;
 using kOS.Safe.Utilities;
+using KSPBuildTools;
 
 namespace kOS.MechJeb2.Addon.Wrapeers
 {
     [KOSNomenclature("BaseWrapper")]
-    public abstract class BaseWrapper : Structure, IBaseWrapper
+    public abstract class BaseWrapper : Structure, IBaseWrapper, ILogContextProvider
     {
         protected object CoreInstance { get; private set; }
         public bool Initialized { get; protected set; }
 
-        public virtual void Initialize(object coreInstance)
+        public virtual void Initialize(object coreInstance, bool force = false)
         {
-            if (Initialized) return;
+            if (Initialized && !force) return;
             CoreInstance = coreInstance;
-            Initialized = true;
             BindObject();
+            RegisterInitializer(InitializeSuffixes);
+            Initialized = true;
         }
         
         protected void AddSufixInternal(string name, Func<object, double> getter, string description,
@@ -72,5 +74,7 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         }
         
         protected virtual void BindObject(){}
+        protected abstract void InitializeSuffixes();
+        public abstract string context();
     }
 }

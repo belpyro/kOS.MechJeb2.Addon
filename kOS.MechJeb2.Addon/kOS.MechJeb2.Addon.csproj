@@ -77,8 +77,20 @@
             <Destination>$(RepoRootPath)GameData/kOS.MechJeb2.Addon/kOS.MechJeb2.Addon.version</Destination>
             <URL>https://github.com/belpyro/kOS.MechJeb2.Addon/releases/latest/download/kOS.MechJeb2.Addon.version</URL>
             <Download>https://github.com/belpyro/kOS.MechJeb2.Addon/releases/latest</Download>
-            <Version>0.0.1</Version>            
+            <Version>$(GitVersion_SemVer)</Version>            
         </KSPVersionFile>
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="GitVersion.yml" />
+    </ItemGroup>
+    <ItemGroup>
+      <ReferencePathWithRefAssemblies Update="\Users\belpyro\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\System.Core.dll" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -103,7 +115,7 @@
             <Output TaskParameter="Assemblies" ItemName="BuiltAssembly"/>
         </GetAssemblyIdentity>
         <PropertyGroup>
-            <ModVersion>%(BuiltAssembly.Version)</ModVersion>
+            <ModVersion>$(GitVersion_SemVer)</ModVersion>
             <OutputDir>$(MSBuildProjectDirectory)/../Build</OutputDir>
             <ZipName>kOS.MechJeb2.Addon-v$(ModVersion).zip</ZipName>
             <ModRoot>$(MSBuildProjectDirectory)/../GameData/kOS.MechJeb2.Addon</ModRoot>

@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using kOS.MechJeb2.Addon.Attributes;
 using kOS.MechJeb2.Addon.Core;
 using kOS.MechJeb2.Addon.Utils;
 using kOS.Safe.Utilities;
@@ -140,16 +141,12 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         private static readonly System.Collections.Generic.Dictionary<MethodInfo, Delegate> _methodCache =
             new System.Collections.Generic.Dictionary<MethodInfo, Delegate>();
 
-        public override void Initialize(object coreInstance)
+        protected override void BindObject()
         {
-            if (Initialized) return;
-            base.Initialize(coreInstance);
-
-            BindInfoItems(coreInstance.GetType());
-            RegisterInitializer(InitializeSuffixes);
+             BindInfoItems(CoreInstance.GetType());
         }
 
-        private void InitializeSuffixes()
+        protected override void InitializeSuffixes()
         {
             // ===== Maneuver / Node =====
             AddSufixInternal("NEXTMANEUVERNODEBURNTIME", NextManeuverNodeBurnTime, "Burn time for next maneuver node", "BURN");
@@ -243,6 +240,8 @@ namespace kOS.MechJeb2.Addon.Wrapeers
             AddSufixInternal("TOTALDVATM", (Delegate)TotalDeltaVAtmosphere, "Total ΔV atmosphere", "TDVATM");
             AddSufixInternal("TOTALDVATMVAC", TotalDeltaVAtmosphereAndVac, "Formatted total ΔV atm/vac", "TDVSTR");
         }
+
+        public override string context() => nameof(MechJebInfoItemsWrapper);
 
         private void BindInfoItems(Type coreType)
         {
