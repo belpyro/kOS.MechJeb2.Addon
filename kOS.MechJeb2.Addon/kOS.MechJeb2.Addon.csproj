@@ -78,7 +78,7 @@
             <Destination>$(RepoRootPath)GameData/kOS.MechJeb2.Addon/kOS.MechJeb2.Addon.version</Destination>
             <URL>https://github.com/belpyro/kOS.MechJeb2.Addon/releases/latest/download/kOS.MechJeb2.Addon.version</URL>
             <Download>https://github.com/belpyro/kOS.MechJeb2.Addon/releases/latest</Download>
-            <Version>0.0.2</Version>            
+            <Version>$(GitVersion_SemVer)</Version>            
         </KSPVersionFile>
     </ItemGroup>
     <ItemGroup>
@@ -117,7 +117,7 @@
             <Output TaskParameter="Assemblies" ItemName="BuiltAssembly"/>
         </GetAssemblyIdentity>
         <PropertyGroup>
-            <ModVersion>%(BuiltAssembly.Version)</ModVersion>
+            <ModVersion>$(GitVersion_SemVer)</ModVersion>
             <OutputDir>$(MSBuildProjectDirectory)/../Build</OutputDir>
             <ZipName>kOS.MechJeb2.Addon-v$(ModVersion).zip</ZipName>
             <ModRoot>$(MSBuildProjectDirectory)/../GameData/kOS.MechJeb2.Addon</ModRoot>
