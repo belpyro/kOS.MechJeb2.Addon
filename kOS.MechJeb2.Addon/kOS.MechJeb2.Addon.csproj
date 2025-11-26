@@ -169,7 +169,8 @@
             <KSPModPath>$(KSPRoot)/$(BinariesOutputRelativePath)</KSPModPath>
         </PropertyGroup>
         <MakeDir Directories="$(OutputDir)" Condition="!Exists('$(OutputDir)')"/>
-        <Exec Command="zip &quot;$(OutputDir)/$(ZipName)&quot; &quot;$(ModRoot)/kOS.MechJeb2.Addon.dll&quot; &quot;$(ModRoot)/kOS.MechJeb2.Addon.version&quot;"/>
+        <Exec WorkingDirectory="$(RepoRootPath)"
+              Command="zip '$(OutputDir)/$(ZipName)' 'GameData/kOS.MechJeb2.Addon/kOS.MechJeb2.Addon.dll' 'GameData/kOS.MechJeb2.Addon/kOS.MechJeb2.Addon.version'" />
         <ItemGroup Condition=" '$(KSPRoot)' != '' ">
             <ModFiles Include="$(RepoModPath)/**/*"/>
         </ItemGroup>
