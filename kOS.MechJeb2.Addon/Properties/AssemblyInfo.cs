@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("kOS.MechJeb2.Addon")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyDescription("Integration layer between kOS and MechJeb2, providing a unified scripting interface and real-time control access.")]
+[assembly: AssemblyConfiguration("Release")]
+[assembly: AssemblyCompany("Belpyro")]
 [assembly: AssemblyProduct("kOS.MechJeb2.Addon")]
 [assembly: AssemblyCopyright("Copyright ©  2025")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+[assembly: AssemblyTrademark("Belpyro")]
+[assembly: AssemblyCulture("en-US")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -20,16 +20,4 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("5BE4D793-8C92-424E-BC9B-200FC9EBC4F4")]
-
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-// [assembly: KSPAssembly("KOS.MechJeb.Addon", 0,0,2)]
 [assembly: KSPAssemblyDependency("kOS",1,3)]
