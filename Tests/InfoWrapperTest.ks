@@ -43,7 +43,7 @@ PRINT "OK.".
 PRINT "-------------------------------".
 
 // -----------------------------------------------------------------------------
-// Test: Maneuver / node
+// Test: Maneuver / node info
 // -----------------------------------------------------------------------------
 PRINT "TEST: maneuver / node info".
 
@@ -51,7 +51,7 @@ SET burnTime TO info:NEXTMANEUVERNODEBURNTIME.
 SET nodeEta TO info:TIMETOMANEUVERNODE.
 SET nodeDv TO info:NEXTMANEUVERNODEDELTAV.
 
-// May be -1 if no node exists, just make sure we can read them:
+// These can be -1 or 0 when no node is present; we only check that access works:
 ASSERT_TRUE("NEXTMANEUVERNODEBURNTIME read OK", TRUE).
 ASSERT_TRUE("TIMETOMANEUVERNODE read OK", TRUE).
 ASSERT_TRUE("NEXTMANEUVERNODEDELTAV read OK", TRUE).
@@ -80,9 +80,9 @@ PRINT "TWR / thrust tests done.".
 PRINT "-------------------------------".
 
 // -----------------------------------------------------------------------------
-// Test: Stage / total ΔV
+// Test: Stage and total deltaV
 // -----------------------------------------------------------------------------
-PRINT "TEST: stage / total ΔV".
+PRINT "TEST: stage and total ΔV".
 
 SET stageVac TO info:STAGEDELTAVVAC.
 SET totalVac TO info:TOTALDVVAC.
@@ -112,13 +112,14 @@ PRINT "Vessel basics tests done.".
 PRINT "-------------------------------".
 
 // -----------------------------------------------------------------------------
-// Test: Target distance / relative motion
+// Test: Target distance and relative velocity
 // -----------------------------------------------------------------------------
-PRINT "TEST: target distance / relative motion".
+PRINT "TEST: target distance and relative velocity".
 
 SET tDist TO info:TARGETDISTANCE.
 SET tRelV TO info:TARGETRELV.
 
+// They may be 0 if there is no target, we only check that access works:
 ASSERT_TRUE("TARGETDISTANCE read OK", TRUE).
 ASSERT_TRUE("TARGETRELV read OK", TRUE).
 
@@ -126,14 +127,14 @@ PRINT "Target info tests done.".
 PRINT "-------------------------------".
 
 // -----------------------------------------------------------------------------
-// Test: Biomes
+// Test: Biome info
 // -----------------------------------------------------------------------------
 PRINT "TEST: biome info".
 
 SET rawBiome TO info:CURRENTRAWBIOME.
 SET biome TO info:CURRENTBIOME.
 
-// May be empty if no biome data is available:
+// May be empty for some situations; just ensure reading works:
 ASSERT_TRUE("CURRENTRAWBIOME read OK", TRUE).
 ASSERT_TRUE("CURRENTBIOME read OK", TRUE).
 

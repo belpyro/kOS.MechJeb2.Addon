@@ -38,17 +38,17 @@ DECLARE FUNCTION ASSERT_TRUE {
 // Getting vessel wrapper
 // -----------------------------------------------------------------------------
 PRINT "Getting Vessel wrapper...".
-SET v TO ADDONS:MJ:CORE:VESSEL.
+SET mjVessel TO ADDONS:MJ:CORE:VESSEL.
 PRINT "OK.".
 PRINT "-------------------------------".
 
 // -----------------------------------------------------------------------------
-// Test: Time & gravity
+// Test: Time and local gravity
 // -----------------------------------------------------------------------------
 PRINT "TEST: TIME / LOCALG".
 
-SET t TO v:TIME.
-SET g TO v:LOCALG.
+SET t TO mjVessel:TIME.
+SET g TO mjVessel:LOCALG.
 
 ASSERT_TRUE("TIME is non-negative", t >= 0).
 ASSERT_TRUE("LOCALG is non-negative", g >= 0).
@@ -61,9 +61,9 @@ PRINT "-------------------------------".
 // -----------------------------------------------------------------------------
 PRINT "TEST: velocities (SPEEDSURFACE, SPEEDVERTICAL, SURFHVEL)".
 
-SET vSurf TO v:SPEEDSURFACE.
-SET vVert TO v:SPEEDVERTICAL.
-SET vHorizSurf TO v:SPEEDSURFACEHORIZONTAL.
+SET vSurf TO mjVessel:SPEEDSURFACE.
+SET vVert TO mjVessel:SPEEDVERTICAL.
+SET vHorizSurf TO mjVessel:SPEEDSURFACEHORIZONTAL.
 
 ASSERT_TRUE("SPEEDSURFACE >= 0", vSurf >= 0).
 ASSERT_TRUE("abs(SPEEDVERTICAL) < 20000", ABS(vVert) < 20000).
@@ -75,15 +75,15 @@ PRINT "-------------------------------".
 // -----------------------------------------------------------------------------
 // Test: Attitude
 // -----------------------------------------------------------------------------
-PRINT "TEST: attitude (HEADING/PITCH/ROLL)".
+PRINT "TEST: attitude (HEADING / PITCH / ROLL)".
 
-SET hdg TO v:VESSELHEADING.
-SET pitch TO v:VESSELPITCH.
-SET roll TO v:VESSELROLL.
+SET hdg TO mjVessel:VESSELHEADING.
+SET pitch TO mjVessel:VESSELPITCH.
+SET roll TO mjVessel:VESSELROLL.
 
-ASSERT_TRUE("HEADING in [0,360)", hdg >= 0 AND hdg < 360).
-ASSERT_TRUE("PITCH in [-90,90]", pitch >= -90 AND pitch <= 90).
-ASSERT_TRUE("ROLL in [-180,180]", roll >= -180 AND roll <= 180).
+ASSERT_TRUE("HEADING in [0, 360)", hdg >= 0 AND hdg < 360).
+ASSERT_TRUE("PITCH in [-90, 90]", pitch >= -90 AND pitch <= 90).
+ASSERT_TRUE("ROLL in [-180, 180]", roll >= -180 AND roll <= 180).
 
 PRINT "Attitude tests done.".
 PRINT "-------------------------------".
@@ -91,11 +91,11 @@ PRINT "-------------------------------".
 // -----------------------------------------------------------------------------
 // Test: Altitudes
 // -----------------------------------------------------------------------------
-PRINT "TEST: altitudes (ALTASL / ALTTRUE / SURFALT)".
+PRINT "TEST: altitudes (ALTITUDEASL / ALTITUDETRUE / SURFACEALTITUDEASL)".
 
-SET altAsl TO v:ALTITUDEASL.
-SET altTrue TO v:ALTITUDETRUE.
-SET surfAlt TO v:SURFACEALTITUDEASL.
+SET altAsl TO mjVessel:ALTITUDEASL.
+SET altTrue TO mjVessel:ALTITUDETRUE.
+SET surfAlt TO mjVessel:SURFACEALTITUDEASL.
 
 ASSERT_TRUE("ALTITUDEASL >= 0", altAsl >= 0).
 ASSERT_TRUE("ALTITUDETRUE >= 0", altTrue >= 0).
@@ -105,15 +105,15 @@ PRINT "Altitude tests done.".
 PRINT "-------------------------------".
 
 // -----------------------------------------------------------------------------
-// Test: Orbit basics
+// Test: Orbit basic access
 // -----------------------------------------------------------------------------
-PRINT "TEST: orbit basic access".
+PRINT "TEST: orbit basic access (APA / PEA / SMA)".
 
-SET apa TO v:ORBITAPA.
-SET pea TO v:ORBITPEA.
-SET sma TO v:ORBITSEMIAXIS.
+SET apa TO mjVessel:ORBITAPA.
+SET pea TO mjVessel:ORBITPEA.
+SET sma TO mjVessel:ORBITSEMIAXIS.
 
-// just making sure access does not throw:
+// These can be negative for suborbital or escape; we only assert that access works:
 ASSERT_TRUE("ORBITAPA read OK", TRUE).
 ASSERT_TRUE("ORBITPEA read OK", TRUE).
 ASSERT_TRUE("ORBITSEMIAXIS read OK", TRUE).
@@ -126,10 +126,10 @@ PRINT "-------------------------------".
 // -----------------------------------------------------------------------------
 PRINT "TEST: AOA / AOS / Q / MACH".
 
-SET aoa TO v:AOA.
-SET aos TO v:AOS.
-SET qdyn TO v:DYNAMICPRESSURE.
-SET mach TO v:MACH.
+SET aoa TO mjVessel:AOA.
+SET aos TO mjVessel:AOS.
+SET qdyn TO mjVessel:DYNAMICPRESSURE.
+SET mach TO mjVessel:MACH.
 
 ASSERT_TRUE("AOA in sane range", ABS(aoa) < 180).
 ASSERT_TRUE("AOS in sane range", ABS(aos) < 180).
@@ -144,8 +144,8 @@ PRINT "-------------------------------".
 // -----------------------------------------------------------------------------
 PRINT "TEST: net forces (PUREDRAG / PURELIFT)".
 
-SET dragF TO v:PUREDRAG.
-SET liftF TO v:PURELIFT.
+SET dragF TO mjVessel:PUREDRAG.
+SET liftF TO mjVessel:PURELIFT.
 
 ASSERT_TRUE("PUREDRAG >= 0", dragF >= 0).
 ASSERT_TRUE("PURELIFT >= 0", liftF >= 0).
