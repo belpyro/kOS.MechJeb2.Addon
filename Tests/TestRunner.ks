@@ -64,19 +64,19 @@ UNTIL NOT running {
     } ELSE IF choice = "1" {
         PRINT "".
         PRINT "Running CoreWrapperTests...".
-        RUN CoreWrapperTests.
+        RUN CoreWrapperTest.
         WAIT_FOR_KEY().
 
     } ELSE IF choice = "2" {
         PRINT "".
         PRINT "Running VesselWrapperTests...".
-        RUN VesselWrapperTests.
+        RUN VesselWrapperTest.
         WAIT_FOR_KEY().
 
     } ELSE IF choice = "3" {
         PRINT "".
         PRINT "Running InfoWrapperTests...".
-        RUN InfoWrapperTests.
+        RUN InfoWrapperTest.
         WAIT_FOR_KEY().
 
     } ELSE IF choice = "4" {
@@ -90,19 +90,19 @@ UNTIL NOT running {
         PRINT "Running ALL test suites...".
 
         PRINT "---------------- CORE ----------------".
-        RUN CoreWrapperTests.
+        RUN CoreWrapperTest.
         WAIT_FOR_KEY().
 
         PRINT "---------------- VESSEL --------------".
-        RUN VesselWrapperTests.
+        RUN VesselWrapperTest.
         WAIT_FOR_KEY().
 
         PRINT "---------------- INFO ----------------".
-        RUN InfoWrapperTests.
+        RUN InfoWrapperTest.
         WAIT_FOR_KEY().
 
         PRINT "---------------- ASCENT --------------".
-        RUN dev.
+        RUN AscentWrapperTest.
         WAIT_FOR_KEY().
 
     } ELSE {
