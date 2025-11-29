@@ -325,6 +325,50 @@ namespace kOS.MechJeb2.Addon.Utils
                 BuildInvoker);
         }
 
+        /// <summary>
+        /// Returns an Action that calls this method on an instance with a single argument.
+        /// Used for calling instance methods like Users.Add(object) where the instance varies.
+        /// </summary>
+        public Action<object, object> AsAction()
+        {
+            if (_selected == null)
+            {
+                if (_methods.Length == 1)
+                    _selected = _methods[0];
+                else
+                    throw new InvalidOperationException("Multiple overloads. Call WithArgs(...) first.");
+            }
+
+            return ReflectionCache.GetOrAddDelegate<Action<object, object>>(
+                _selected,
+                "action",
+                typeof(object),
+                BuildAction);
+        }
+
+        private Action<object, object> BuildAction()
+        {
+            var method = _selected!;
+            var instanceParam = Expression.Parameter(typeof(object), "instance");
+            var argParam = Expression.Parameter(typeof(object), "arg");
+
+            var castInstance = Expression.Convert(instanceParam, method.DeclaringType!);
+            var parameters = method.GetParameters();
+
+            Expression[] callArgs;
+            if (parameters.Length == 1)
+            {
+                callArgs = new[] { Expression.Convert(argParam, parameters[0].ParameterType) };
+            }
+            else
+            {
+                callArgs = new Expression[0];
+            }
+
+            var call = Expression.Call(castInstance, method, callArgs);
+            return Expression.Lambda<Action<object, object>>(call, instanceParam, argParam).Compile();
+        }
+
         private Func<object[], object> BuildInvoker()
         {
             var method = _selected!;
