@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using kOS.AddOns;
 using kOS.MechJeb2.Addon.Core;
 using kOS.MechJeb2.Addon.Utils;
@@ -34,7 +35,7 @@ namespace kOS.MechJeb2.Addon
             if (!_isCoreInitialized) TryInitializeMechJebCore();
             _isMechJebDev ??= _mechJebCore.GetType().Assembly.IsMechJebDevBuild();
             Log.Debug($"MechJeb DEV build detected: {_isMechJebDev}");
-            return (bool)MechJebController.IsAvailable && (bool)_isMechJebDev;
+            return MechJebController.IsAvailable;
         }
 
         private void InitializeSuffixes()
@@ -45,14 +46,21 @@ namespace kOS.MechJeb2.Addon
                     Available()
                         ? MechJebController.Instance
                         : throw new KOSUnavailableAddonException(
-                            "CORE wrapper is unavailable. Please install a MechJeb2 DEV build and make sure the MechJebCore module is running on this vessel.",
+                            "CORE wrapper is unavailable. Please install a MechJeb2 and make sure the MechJebCore module is running on this vessel.",
                             "MechJeb2")));
             AddSuffix("INIT",
                 new OneArgsSuffix<BooleanValue>((val) => TryInitializeMechJebCore(val),
                     "Manually (re)initializes the MechJeb core wrapper. Pass TRUE to force reinitialization."));
             this.AddSuffix("VERSION",
-                new NoArgsSuffix<VersionInfo>(ReflectionUtils.GetGitVersionInfo,
+                new NoArgsSuffix<VersionInfo>(GetVersionInfo,
                     "Returns the kOS.MechJeb2.Addon version (major.minor.patch.build)."));
+        }
+
+        private VersionInfo GetVersionInfo()
+        {
+            var asm = Assembly.GetExecutingAssembly();
+            var ver =  asm.GetName().Version;
+            return new VersionInfo(ver.Major, ver.Minor, ver.Build, ver.Revision);
         }
 
         private void TryInitializeMechJebCore(bool force = false)
@@ -60,33 +68,24 @@ namespace kOS.MechJeb2.Addon
             Log.Debug($"Trying to initialize MechJebCore (force={force})");
             if (_isCoreInitialized && !force) return;
 
+            var vesselExtensionType = Constants.VesselExtensionName.GetTypeFromCache();
+            if (vesselExtensionType == null)
+            {
+                Log.Error("[kOS.MJ] Cannot find MuMech.VesselExtensions type");
+                return;
+            }
+
+            var getMasterMechJeb =
+                vesselExtensionType.GetMethod("GetMasterMechJeb", BindingFlags.Public | BindingFlags.Static);
+
             var vessel = shared.Vessel;
 
-            if (vessel == null)
+            if (vessel == null || getMasterMechJeb == null)
                 return;
-
-            var mechJebModules =
-                vessel?.FindModuleByTypeName(Constants.MechjebCoreModuleName).ToArray();
-            
-            Log.Debug($"Found {mechJebModules.Length} MechJebCore modules on vessel");
-            
-            if (mechJebModules.Length == 0)
-            {
-                Log.Warning("Cannot find MechJebCore modules");
-                return;
-            }
-
-            var checkIsRunning = Reflect.On(mechJebModules[0])
-                .Field("running").AsGetter<bool>();
-            if (mechJebModules.Length > 1 && mechJebModules.Count(m => checkIsRunning(m)) > 1)
-            {
-                Log.Error("Only one MechJebCore module is supported in running state");
-                return;
-            }
 
             try
             {
-                var core = mechJebModules.SingleOrDefault(m => checkIsRunning(m));
+                var core = getMasterMechJeb?.Invoke(null, new object[] { vessel }) as PartModule;
 
                 if (core == null)
                 {

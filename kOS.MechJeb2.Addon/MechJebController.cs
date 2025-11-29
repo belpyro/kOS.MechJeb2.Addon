@@ -9,9 +9,6 @@ namespace kOS.MechJeb2.Addon
 
         public static MechJebCoreWrapper Instance => _instance ??= new MechJebCoreWrapper();
 
-        public static BooleanValue IsAvailable => Instance is { Initialized: true }
-                                                  && Instance.VesselState.Initialized &&
-                                                  Instance.Ascent.Initialized &&
-                                                  Instance.InfoItems.Initialized;
+        public static BooleanValue IsAvailable => Instance is { Initialized: true };
     }
 }

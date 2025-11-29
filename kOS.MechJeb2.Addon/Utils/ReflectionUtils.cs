@@ -232,5 +232,16 @@ namespace kOS.MechJeb2.Addon.Utils
             var patch = type.GetField("Patch", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Static)?.GetValue(null);
             return new VersionInfo(int.Parse(major.ToString()), int.Parse(minor.ToString()), int.Parse(patch.ToString()),0);
         }
+        
+        internal static Type GetTypeFromCache(this string name)
+        {
+            Type type = null;
+            AssemblyLoader.loadedAssemblies.TypeOperation(t =>
+            {
+                if (t.FullName == name)
+                    type = t;
+            });
+            return type;
+        }
     }
 }

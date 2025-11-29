@@ -12,122 +12,129 @@ namespace kOS.MechJeb2.Addon.Wrapeers
     [KOSNomenclature("AscentWrapper")]
     public class MechJebAscentWrapper : BaseWrapper, IMechJebAscentWrapper
     {
-        private object _coreModule;
-        private object _ascentSettings;
-        private object _stagingController;
-        private object _thrustController;
-        private object _nodeExecutor;
+        private Func<object, object> _ascentSettingsGetter;
+        private Func<object, object> _stagingControllerGetter;
+        private Func<object, object> _thrustControllerGetter;
+        private Func<object, object> _nodeExecutorGetter;
+        private Func<object, object> _autopilotGetter;
+
 
         protected override void BindObject()
         {
-            _coreModule = Member(CoreInstance, "Core").GetField<object>()(CoreInstance);
-            _ascentSettings = Member(_coreModule, "AscentSettings").GetField<object>()(_coreModule);
-            _stagingController = Member(_coreModule, "Staging").GetField<object>()(_coreModule);
-            _thrustController = Member(_coreModule, "Thrust").GetField<object>()(_coreModule);
-            _nodeExecutor = Member(_coreModule, "Node").GetField<object>()(_coreModule);
+            _ascentSettingsGetter = Member(MasterMechJeb, "AscentSettings").GetField<object>();
+            _stagingControllerGetter = Member(MasterMechJeb, "Staging").GetField<object>();
+            _thrustControllerGetter = Member(MasterMechJeb, "Thrust").GetField<object>();
+            _nodeExecutorGetter = Member(MasterMechJeb, "Node").GetField<object>();  
+            _autopilotGetter = Member(MasterMechJeb, "Ascent").GetProp<object>();  
+            
+            var ascentSettings = _ascentSettingsGetter(MasterMechJeb);
+            var stagingController = _stagingControllerGetter(MasterMechJeb);
+            var thrustController = _thrustControllerGetter(MasterMechJeb);
+            var nodeExecutor = _nodeExecutorGetter(MasterMechJeb);
+            var autopilot =  _autopilotGetter(MasterMechJeb);
 
-            GetEnabled = Member(CoreInstance, nameof(Enabled)).GetProp<bool>();
-            SetEnabled = Member(CoreInstance, nameof(Enabled)).SetProp<bool>();
+            GetEnabled = Member(autopilot, nameof(Enabled)).GetProp<bool>();
+            SetEnabled = Member(autopilot, nameof(Enabled)).SetProp<bool>();
 
             (GetDesiredAltitudeDouble, SetDesiredAltitude) =
-                BindEditable<double>(_ascentSettings, "DesiredOrbitAltitude");
+                BindEditable<double>(ascentSettings, "DesiredOrbitAltitude");
 
-            GetAutoPath = Member(_ascentSettings, "AutoPath").GetField<bool>();
-            SetAutoPath = Member(_ascentSettings, "AutoPath").SetField<bool>();
+            GetAutoPath = Member(ascentSettings, "AutoPath").GetField<bool>();
+            SetAutoPath = Member(ascentSettings, "AutoPath").SetField<bool>();
 
-            GetAscentTypeInteger = Member(_ascentSettings, "AscentTypeInteger").GetField<int>();
+            GetAscentTypeInteger = Member(ascentSettings, "AscentTypeInteger").GetField<int>();
 
             (GetTurnStartAltitudeDouble, SetTurnStartAltitude) =
-                BindEditable<double>(_ascentSettings, "TurnStartAltitude");
+                BindEditable<double>(ascentSettings, "TurnStartAltitude");
 
-            GetAutostage = Member(_ascentSettings, "Autostage").GetProp<bool>();
-            SetAutostage = Member(_ascentSettings, "Autostage").SetProp<bool>();
+            GetAutostage = Member(ascentSettings, "Autostage").GetProp<bool>();
+            SetAutostage = Member(ascentSettings, "Autostage").SetProp<bool>();
 
             (GetTurnStartVelocityDouble, SetTurnStartVelocity) =
-                BindEditable<double>(_ascentSettings, "TurnStartVelocity");
-            (GetTurnEndAltitudeDouble, SetTurnEndAltitude) = BindEditable<double>(_ascentSettings, "TurnEndAltitude");
-            (GetTurnEndAngleDouble, SetTurnEndAngle) = BindEditable<double>(_ascentSettings, "TurnEndAngle");
+                BindEditable<double>(ascentSettings, "TurnStartVelocity");
+            (GetTurnEndAltitudeDouble, SetTurnEndAltitude) = BindEditable<double>(ascentSettings, "TurnEndAltitude");
+            (GetTurnEndAngleDouble, SetTurnEndAngle) = BindEditable<double>(ascentSettings, "TurnEndAngle");
             (GetTurnShapeExponentDouble, SetTurnShapeExponent) =
-                BindEditable<double>(_ascentSettings, "TurnShapeExponent");
+                BindEditable<double>(ascentSettings, "TurnShapeExponent");
 
-            GetAutoDeployAntennas = Member(_ascentSettings, "AutoDeployAntennas").GetField<bool>();
-            SetAutoDeployAntennas = Member(_ascentSettings, "AutoDeployAntennas").SetField<bool>();
+            GetAutoDeployAntennas = Member(ascentSettings, "AutoDeployAntennas").GetField<bool>();
+            SetAutoDeployAntennas = Member(ascentSettings, "AutoDeployAntennas").SetField<bool>();
 
-            GetAutodeploySolarPanels = Member(_ascentSettings, "AutodeploySolarPanels").GetField<bool>();
-            SetAutodeploySolarPanels = Member(_ascentSettings, "AutodeploySolarPanels").SetField<bool>();
+            GetAutodeploySolarPanels = Member(ascentSettings, "AutodeploySolarPanels").GetField<bool>();
+            SetAutodeploySolarPanels = Member(ascentSettings, "AutodeploySolarPanels").SetField<bool>();
 
-            GetSkipCircularization = Member(_ascentSettings, "SkipCircularization").GetField<bool>();
-            SetSkipCircularization = Member(_ascentSettings, "SkipCircularization").SetField<bool>();
+            GetSkipCircularization = Member(ascentSettings, "SkipCircularization").GetField<bool>();
+            SetSkipCircularization = Member(ascentSettings, "SkipCircularization").SetField<bool>();
 
-            (GetAutostageLimit, SetAutostageLimit) = BindEditable<int>(_stagingController, "AutostageLimit");
+            (GetAutostageLimit, SetAutostageLimit) = BindEditable<int>(stagingController, "AutostageLimit");
             (GetAutostagePreDelay, SetAutostagePreDelay) =
-                BindEditable<double>(_stagingController, "AutostagePreDelay");
+                BindEditable<double>(stagingController, "AutostagePreDelay");
             (GetAutostagePostDelay, SetAutostagePostDelay) =
-                BindEditable<double>(_stagingController, "AutostagePostDelay");
+                BindEditable<double>(stagingController, "AutostagePostDelay");
             (GetFairingMaxAerothermalFlux, SetFairingMaxAerothermalFlux) =
-                BindEditable<double>(_stagingController, "FairingMaxAerothermalFlux");
+                BindEditable<double>(stagingController, "FairingMaxAerothermalFlux");
             (GetFairingMaxDynamicPressure, SetFairingMaxDynamicPressure) =
-                BindEditable<double>(_stagingController, "FairingMaxDynamicPressure");
+                BindEditable<double>(stagingController, "FairingMaxDynamicPressure");
             (GetFairingMinAltitude, SetFairingMinAltitude) =
-                BindEditable<double>(_stagingController, "FairingMinAltitude");
+                BindEditable<double>(stagingController, "FairingMinAltitude");
 
-            GetHotStaging = Member(_stagingController, "HotStaging").GetField<bool>();
-            SetHotStaging = Member(_stagingController, "HotStaging").SetField<bool>();
+            GetHotStaging = Member(stagingController, "HotStaging").GetField<bool>();
+            SetHotStaging = Member(stagingController, "HotStaging").SetField<bool>();
 
             (GetHotStagingLeadTime, SetHotStagingLeadTime) =
-                BindEditable<double>(_stagingController, "HotStagingLeadTime");
+                BindEditable<double>(stagingController, "HotStagingLeadTime");
 
-            GetDropSolids = Member(_stagingController, "DropSolids").GetField<bool>();
-            SetDropSolids = Member(_stagingController, "DropSolids").SetField<bool>();
+            GetDropSolids = Member(stagingController, "DropSolids").GetField<bool>();
+            SetDropSolids = Member(stagingController, "DropSolids").SetField<bool>();
 
             (GetDropSolidsLeadTime, SetDropSolidsLeadTime) =
-                BindEditable<double>(_stagingController, "DropSolidsLeadTime");
+                BindEditable<double>(stagingController, "DropSolidsLeadTime");
             (GetClampAutoStageThrustPct, SetClampAutoStageThrustPct) =
-                BindEditable<double>(_stagingController, "ClampAutoStageThrustPct");
+                BindEditable<double>(stagingController, "ClampAutoStageThrustPct");
             
             // --- NEW: Desired inclination (EditableDoubleMult DesiredInclination)
             (GetDesiredInclinationDouble, SetDesiredInclination) =
-                BindEditable<double>(_ascentSettings, "DesiredInclination");
+                BindEditable<double>(ascentSettings, "DesiredInclination");
             // --- NEW: Corrective steering
-            GetCorrectiveSteering = Member(_ascentSettings, "CorrectiveSteering").GetField<bool>();
-            SetCorrectiveSteering = Member(_ascentSettings, "CorrectiveSteering").SetField<bool>();
+            GetCorrectiveSteering = Member(ascentSettings, "CorrectiveSteering").GetField<bool>();
+            SetCorrectiveSteering = Member(ascentSettings, "CorrectiveSteering").SetField<bool>();
 
             (GetCorrectiveSteeringGainDouble, SetCorrectiveSteeringGain) =
-                BindEditable<double>(_ascentSettings, "CorrectiveSteeringGain");
+                BindEditable<double>(ascentSettings, "CorrectiveSteeringGain");
 
             // --- NEW: Roll settings
             (GetVerticalRollDouble, SetVerticalRoll) =
-                BindEditable<double>(_ascentSettings, "VerticalRoll");
+                BindEditable<double>(ascentSettings, "VerticalRoll");
 
             (GetTurnRollDouble, SetTurnRoll) =
-                BindEditable<double>(_ascentSettings, "TurnRoll");
+                BindEditable<double>(ascentSettings, "TurnRoll");
 
             (GetRollAltitudeDouble, SetRollAltitude) =
-                BindEditable<double>(_ascentSettings, "RollAltitude");
+                BindEditable<double>(ascentSettings, "RollAltitude");
 
-            GetForceRoll = Member(_ascentSettings, "ForceRoll").GetField<bool>();
-            SetForceRoll = Member(_ascentSettings, "ForceRoll").SetField<bool>();
+            GetForceRoll = Member(ascentSettings, "ForceRoll").GetField<bool>();
+            SetForceRoll = Member(ascentSettings, "ForceRoll").SetField<bool>();
             // --- NEW: AoA & Q limits
-            GetLimitAoA = Member(_ascentSettings, "LimitAoA").GetField<bool>();
-            SetLimitAoA = Member(_ascentSettings, "LimitAoA").SetField<bool>();
+            GetLimitAoA = Member(ascentSettings, "LimitAoA").GetField<bool>();
+            SetLimitAoA = Member(ascentSettings, "LimitAoA").SetField<bool>();
 
             (GetMaxAoADouble, SetMaxAoA) =
-                BindEditable<double>(_ascentSettings, "MaxAoA");
+                BindEditable<double>(ascentSettings, "MaxAoA");
 
             (GetAoALimitFadeoutPressureDouble, SetAoALimitFadeoutPressure) =
-                BindEditable<double>(_ascentSettings, "AOALimitFadeoutPressure");
+                BindEditable<double>(ascentSettings, "AOALimitFadeoutPressure");
 
             (GetLimitQaDouble, SetLimitQa) =
-                BindEditable<double>(_thrustController,"MaxDynamicPressure");
+                BindEditable<double>(thrustController,"MaxDynamicPressure");
 
-            GetLimitQaEnabled = Member(_thrustController, "LimitDynamicPressure").GetField<bool>();
-            SetLimitQaEnabled = Member(_thrustController, "LimitDynamicPressure").SetField<bool>();
+            GetLimitQaEnabled = Member(thrustController, "LimitDynamicPressure").GetField<bool>();
+            SetLimitQaEnabled = Member(thrustController, "LimitDynamicPressure").SetField<bool>();
             
-            GetLimitToPreventOverheats = Member(_thrustController, "LimitToPreventOverheats").GetField<bool>();
-            SetLimitToPreventOverheats = Member(_thrustController, "LimitToPreventOverheats").SetField<bool>();
+            GetLimitToPreventOverheats = Member(thrustController, "LimitToPreventOverheats").GetField<bool>();
+            SetLimitToPreventOverheats = Member(thrustController, "LimitToPreventOverheats").SetField<bool>();
             
-            GetAutoWarp =  Member(_nodeExecutor, "AutoWarp").GetField<bool>();
-            SetAutoWarp =  Member(_nodeExecutor, "AutoWarp").SetField<bool>();
+            GetAutoWarp =  Member(nodeExecutor, "AutoWarp").GetField<bool>();
+            SetAutoWarp =  Member(nodeExecutor, "AutoWarp").SetField<bool>();
         }
 
         protected override void InitializeSuffixes()
@@ -135,207 +142,207 @@ namespace kOS.MechJeb2.Addon.Wrapeers
             AddSuffix("ENABLED",
                 new SetSuffix<BooleanValue>(() => Enabled, value => Enabled = value, "Is Ascent autopilot enable?"));
             AddSuffix(new[] { "DESIREDALTITUDE", "DSRALT" },
-                new SetSuffix<ScalarDoubleValue>(() => GetDesiredAltitudeDouble(_ascentSettings),
-                    value => SetDesiredAltitude(_ascentSettings, value),
+                new SetSuffix<ScalarDoubleValue>(() => GetDesiredAltitudeDouble(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetDesiredAltitude(_ascentSettingsGetter(MasterMechJeb), value),
                     "Desired Altitude"));
             AddSuffix(new[] { "TURNSTARTALTITUDE", "STARTALT" },
-                new SetSuffix<ScalarDoubleValue>(() => GetTurnStartAltitudeDouble(_ascentSettings),
-                    value => SetTurnStartAltitude(_ascentSettings, value),
+                new SetSuffix<ScalarDoubleValue>(() => GetTurnStartAltitudeDouble(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetTurnStartAltitude(_ascentSettingsGetter(MasterMechJeb), value),
                     "Turn Start Altitude"));
             AddSuffix(new[] { "TURNSTARTVELOCITY", "STARTV" },
-                new SetSuffix<ScalarDoubleValue>(() => GetTurnStartVelocityDouble(_ascentSettings),
-                    value => SetTurnStartVelocity(_ascentSettings, value),
+                new SetSuffix<ScalarDoubleValue>(() => GetTurnStartVelocityDouble(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetTurnStartVelocity(_ascentSettingsGetter(MasterMechJeb), value),
                     "Turn Start Velocity"));
             AddSuffix(new[] { "TURNENDALTITUDE", "ENDALT" },
-                new SetSuffix<ScalarDoubleValue>(() => GetTurnEndAltitudeDouble(_ascentSettings),
-                    value => SetTurnEndAltitude(_ascentSettings, value),
+                new SetSuffix<ScalarDoubleValue>(() => GetTurnEndAltitudeDouble(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetTurnEndAltitude(_ascentSettingsGetter(MasterMechJeb), value),
                     "Turn End Altitude"));
             AddSuffix(new[] { "TURNENDANGLE", "ENDANG" },
-                new SetSuffix<ScalarDoubleValue>(() => GetTurnEndAngleDouble(_ascentSettings),
-                    value => SetTurnEndAngle(_ascentSettings, value),
+                new SetSuffix<ScalarDoubleValue>(() => GetTurnEndAngleDouble(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetTurnEndAngle(_ascentSettingsGetter(MasterMechJeb), value),
                     "Turn End Angle"));
             AddSuffix(new[] { "TURNSHAPEEXPONENT", "TSHAPEEXP" },
-                new ClampSetSuffix<ScalarDoubleValue>(() => GetTurnShapeExponentDouble(_ascentSettings),
-                    value => SetTurnShapeExponent(_ascentSettings, value), min: 0, max: 1, stepIncrement: 0f,
+                new ClampSetSuffix<ScalarDoubleValue>(() => GetTurnShapeExponentDouble(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetTurnShapeExponent(_ascentSettingsGetter(MasterMechJeb), value), min: 0, max: 1, stepIncrement: 0f,
                     "Turn Shape Exponent"));
             AddSuffix(new[] { "AUTOPATH" },
-                new SetSuffix<BooleanValue>(() => GetAutoPath(_ascentSettings),
-                    value => SetAutoPath(_ascentSettings, value), "Automatic Altitude Turn"));
+                new SetSuffix<BooleanValue>(() => GetAutoPath(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetAutoPath(_ascentSettingsGetter(MasterMechJeb), value), "Automatic Altitude Turn"));
             AddSuffix(new[] { "AUTOSTAGE" },
-                new SetSuffix<BooleanValue>(() => GetAutostage(_ascentSettings),
-                    value => SetAutostage(_ascentSettings, value), "Auto Stage Status"));
+                new SetSuffix<BooleanValue>(() => GetAutostage(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetAutostage(_ascentSettingsGetter(MasterMechJeb), value), "Auto Stage Status"));
             AddSuffix(new[] { "ASCENTTYPE", "ASCTYPE" },
                 new NoArgsSuffix<StringValue>(() => AscentType == 0 ? "CLASSIC" : "NOT SUPPORTED"));
             AddSuffix(new[] { "AUTODEPLOYANTENNAS", "AUTODANT" },
-                new SetSuffix<BooleanValue>(() => GetAutoDeployAntennas(_ascentSettings),
-                    value => SetAutoDeployAntennas(_ascentSettings, value),
+                new SetSuffix<BooleanValue>(() => GetAutoDeployAntennas(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetAutoDeployAntennas(_ascentSettingsGetter(MasterMechJeb), value),
                     "Automatically deploy antennas after launch"));
             AddSuffix(new[] { "AUTODEPLOYSOLARPANELS", "AUTODSOL" },
-                new SetSuffix<BooleanValue>(() => GetAutodeploySolarPanels(_ascentSettings),
-                    value => SetAutodeploySolarPanels(_ascentSettings, value),
+                new SetSuffix<BooleanValue>(() => GetAutodeploySolarPanels(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetAutodeploySolarPanels(_ascentSettingsGetter(MasterMechJeb), value),
                     "Automatically deploy solar panels after launch"));
             AddSuffix(new[] { "SKIPCIRCULARIZATION", "SKIPCIRC" },
-                new SetSuffix<BooleanValue>(() => GetSkipCircularization(_ascentSettings),
-                    value => SetSkipCircularization(_ascentSettings, value),
+                new SetSuffix<BooleanValue>(() => GetSkipCircularization(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetSkipCircularization(_ascentSettingsGetter(MasterMechJeb), value),
                     "Skip circularization burn at apoapsis"));
 
             // --- Autostage settings (staging controller) ---
             AddSuffix(new[] { "AUTOSTAGELIMIT", "ASTGLIM" },
                 new SetSuffix<ScalarIntValue>(
-                    () => GetAutostageLimit(_stagingController),
-                    value => SetAutostageLimit(_stagingController, value),
+                    () => GetAutostageLimit(_stagingControllerGetter(MasterMechJeb)),
+                    value => SetAutostageLimit(_stagingControllerGetter(MasterMechJeb), value),
                     "Maximum number of stages to auto-stage"));
 
             AddSuffix(new[] { "AUTOSTAGEPREDELAY", "ASTGPRE" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetAutostagePreDelay(_stagingController),
-                    value => SetAutostagePreDelay(_stagingController, value),
+                    () => GetAutostagePreDelay(_stagingControllerGetter(MasterMechJeb)),
+                    value => SetAutostagePreDelay(_stagingControllerGetter(MasterMechJeb), value),
                     "Delay before staging (seconds)"));
 
             AddSuffix(new[] { "AUTOSTAGEPOSTDELAY", "ASTGPOST" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetAutostagePostDelay(_stagingController),
-                    value => SetAutostagePostDelay(_stagingController, value),
+                    () => GetAutostagePostDelay(_stagingControllerGetter(MasterMechJeb)),
+                    value => SetAutostagePostDelay(_stagingControllerGetter(MasterMechJeb), value),
                     "Delay after staging (seconds)"));
 
             // Fairing jettison conditions
             AddSuffix(new[] { "FAIRINGMAXDYNAMICPRESSURE", "FMAXQ" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetFairingMaxDynamicPressure(_stagingController),
-                    value => SetFairingMaxDynamicPressure(_stagingController, value),
+                    () => GetFairingMaxDynamicPressure(_stagingControllerGetter(MasterMechJeb)),
+                    value => SetFairingMaxDynamicPressure(_stagingControllerGetter(MasterMechJeb), value),
                     "Maximum dynamic pressure for fairing jettison"));
 
             AddSuffix(new[] { "FAIRINGMINALTITUDE", "FMINALT" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetFairingMinAltitude(_stagingController),
-                    value => SetFairingMinAltitude(_stagingController, value),
+                    () => GetFairingMinAltitude(_stagingControllerGetter(MasterMechJeb)),
+                    value => SetFairingMinAltitude(_stagingControllerGetter(MasterMechJeb), value),
                     "Minimum altitude for fairing jettison"));
 
             AddSuffix(new[] { "FAIRINGMAXAEROTHERMALFLUX", "FMAXFLUX" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetFairingMaxAerothermalFlux(_stagingController),
-                    value => SetFairingMaxAerothermalFlux(_stagingController, value),
+                    () => GetFairingMaxAerothermalFlux(_stagingControllerGetter(MasterMechJeb)),
+                    value => SetFairingMaxAerothermalFlux(_stagingControllerGetter(MasterMechJeb), value),
                     "Maximum aerothermal flux for fairing jettison"));
 
             // Hot staging
             AddSuffix(new[] { "HOTSTAGING", "HOTSTAGE" },
                 new SetSuffix<BooleanValue>(
-                    () => GetHotStaging(_stagingController),
-                    value => SetHotStaging(_stagingController, value),
+                    () => GetHotStaging(_stagingControllerGetter(MasterMechJeb)),
+                    value => SetHotStaging(_stagingControllerGetter(MasterMechJeb), value),
                     "Enable hot staging"));
             AddSuffix(new[] { "HOTSTAGINGLEADTIME", "HOTLEAD" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetHotStagingLeadTime(_stagingController),
-                    value => SetHotStagingLeadTime(_stagingController, value),
+                    () => GetHotStagingLeadTime(_stagingControllerGetter(MasterMechJeb)),
+                    value => SetHotStagingLeadTime(_stagingControllerGetter(MasterMechJeb), value),
                     "Hot staging lead time (seconds)"));
 
             // Drop solids
             AddSuffix(new[] { "DROPSOLIDS", "DRPSLD" },
                 new SetSuffix<BooleanValue>(
-                    () => GetDropSolids(_stagingController),
-                    value => SetDropSolids(_stagingController, value),
+                    () => GetDropSolids(_stagingControllerGetter(MasterMechJeb)),
+                    value => SetDropSolids(_stagingControllerGetter(MasterMechJeb), value),
                     "Enable dropping of solid boosters"));
             AddSuffix(new[] { "DROPSOLIDSLEADTIME", "SLDSLEAD" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetDropSolidsLeadTime(_stagingController),
-                    value => SetDropSolidsLeadTime(_stagingController, value),
+                    () => GetDropSolidsLeadTime(_stagingControllerGetter(MasterMechJeb)),
+                    value => SetDropSolidsLeadTime(_stagingControllerGetter(MasterMechJeb), value),
                     "Lead time before dropping solids (seconds)"));
 
             // Clamp AutoStage thrust percent
             AddSuffix(new[] { "CLAMPAUTOSTAGETHRUSTPCT", "CLAMPTHRUST" },
                 new ClampSetSuffix<ScalarDoubleValue>(
-                    () => GetClampAutoStageThrustPct(_stagingController),
-                    value => SetClampAutoStageThrustPct(_stagingController, value),
+                    () => GetClampAutoStageThrustPct(_stagingControllerGetter(MasterMechJeb)),
+                    value => SetClampAutoStageThrustPct(_stagingControllerGetter(MasterMechJeb), value),
                     min: 0, max: 1, stepIncrement: 0f,
                     "Minimum thrust percent required to auto-stage"));
              // --- Classic orbit target: inclination ---
             AddSuffix(new[] { "DESIREDINCLINATION", "INC" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetDesiredInclinationDouble(_ascentSettings),
-                    value => SetDesiredInclination(_ascentSettings, value),
+                    () => GetDesiredInclinationDouble(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetDesiredInclination(_ascentSettingsGetter(MasterMechJeb), value),
                     "Desired orbital inclination (degrees)"));
 
             // --- Corrective steering ---
             AddSuffix(new[] { "CORRECTIVESTEERING", "CSTEER" },
                 new SetSuffix<BooleanValue>(
-                    () => GetCorrectiveSteering(_ascentSettings),
-                    value => SetCorrectiveSteering(_ascentSettings, value),
+                    () => GetCorrectiveSteering(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetCorrectiveSteering(_ascentSettingsGetter(MasterMechJeb), value),
                     "Enable classic corrective steering"));
 
             AddSuffix(new[] { "CORRECTIVESTEERINGGAIN", "CSTEERGAIN" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetCorrectiveSteeringGainDouble(_ascentSettings),
-                    value => SetCorrectiveSteeringGain(_ascentSettings, value),
+                    () => GetCorrectiveSteeringGainDouble(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetCorrectiveSteeringGain(_ascentSettingsGetter(MasterMechJeb), value),
                     "Corrective steering gain"));
 
             // --- Roll profile ---
             AddSuffix(new[] { "FORCEROLL", "FROLL" },
                 new SetSuffix<BooleanValue>(
-                    () => GetForceRoll(_ascentSettings),
-                    value => SetForceRoll(_ascentSettings, value),
+                    () => GetForceRoll(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetForceRoll(_ascentSettingsGetter(MasterMechJeb), value),
                     "Force roll during ascent"));
 
             AddSuffix(new[] { "VERTICALROLL", "VROLL" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetVerticalRollDouble(_ascentSettings),
-                    value => SetVerticalRoll(_ascentSettings, value),
+                    () => GetVerticalRollDouble(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetVerticalRoll(_ascentSettingsGetter(MasterMechJeb), value),
                     "Roll angle during vertical ascent (degrees)"));
 
             AddSuffix(new[] { "TURNROLL", "TROLL" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetTurnRollDouble(_ascentSettings),
-                    value => SetTurnRoll(_ascentSettings, value),
+                    () => GetTurnRollDouble(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetTurnRoll(_ascentSettingsGetter(MasterMechJeb), value),
                     "Roll angle during gravity turn (degrees)"));
 
             AddSuffix(new[] { "ROLLALTITUDE", "ROLLALT" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetRollAltitudeDouble(_ascentSettings),
-                    value => SetRollAltitude(_ascentSettings, value),
+                    () => GetRollAltitudeDouble(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetRollAltitude(_ascentSettingsGetter(MasterMechJeb), value),
                     "Altitude at which roll is applied"));
 
             // --- AoA & Q limits ---
             AddSuffix(new[] { "LIMITAOA", "LIMAOA" },
                 new SetSuffix<BooleanValue>(
-                    () => GetLimitAoA(_ascentSettings),
-                    value => SetLimitAoA(_ascentSettings, value),
+                    () => GetLimitAoA(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetLimitAoA(_ascentSettingsGetter(MasterMechJeb), value),
                     "Enable angle-of-attack limit"));
 
             AddSuffix(new[] { "MAXAOA", "MAXAOA" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetMaxAoADouble(_ascentSettings),
-                    value => SetMaxAoA(_ascentSettings, value),
+                    () => GetMaxAoADouble(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetMaxAoA(_ascentSettingsGetter(MasterMechJeb), value),
                     "Maximum angle of attack (degrees)"));
 
             AddSuffix(new[] { "AOALIMITFADEOUTPRESSURE", "AOAFADEQ" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetAoALimitFadeoutPressureDouble(_ascentSettings),
-                    value => SetAoALimitFadeoutPressure(_ascentSettings, value),
+                    () => GetAoALimitFadeoutPressureDouble(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetAoALimitFadeoutPressure(_ascentSettingsGetter(MasterMechJeb), value),
                     "Pressure at which AoA limit fades out"));
 
             AddSuffix(new[] { "LIMITQA", "LIMQA" },
                 new SetSuffix<ScalarDoubleValue>(
-                    () => GetLimitQaDouble(_thrustController),
-                    value => SetLimitQa(_thrustController, value),
+                    () => GetLimitQaDouble(_thrustControllerGetter(MasterMechJeb)),
+                    value => SetLimitQa(_thrustControllerGetter(MasterMechJeb), value),
                     "Dynamic pressure limit (Q)"));
 
             AddSuffix(new[] { "LIMITQAENABLED", "LIMQAEN" },
                 new SetSuffix<BooleanValue>(
-                    () => GetLimitQaEnabled(_thrustController),
-                    value => SetLimitQaEnabled(_thrustController, value),
+                    () => GetLimitQaEnabled(_thrustControllerGetter(MasterMechJeb)),
+                    value => SetLimitQaEnabled(_thrustControllerGetter(MasterMechJeb), value),
                     "Enable dynamic pressure limit (Q)"));
             
             // --- Thrust controller safety limits ---
             AddSuffix(new[] { "LIMITTOPREVENTOVERHEATS", "LIMOVHT" },
                 new SetSuffix<BooleanValue>(
-                    () => GetLimitToPreventOverheats(_thrustController),
-                    value => SetLimitToPreventOverheats(_thrustController, value),
+                    () => GetLimitToPreventOverheats(_thrustControllerGetter(MasterMechJeb)),
+                    value => SetLimitToPreventOverheats(_thrustControllerGetter(MasterMechJeb), value),
                     "Limit thrust to prevent engine overheating"));
 
             // --- Node executor auto-warp ---
             AddSuffix(new[] { "AUTOWARP", "AWARP" },
                 new SetSuffix<BooleanValue>(
-                    () => GetAutoWarp(_nodeExecutor),
-                    value => SetAutoWarp(_nodeExecutor, value),
+                    () => GetAutoWarp(_nodeExecutorGetter(MasterMechJeb)),
+                    value => SetAutoWarp(_nodeExecutorGetter(MasterMechJeb), value),
                     "Enable automatic time warp for maneuver execution"));
         }
 
@@ -345,16 +352,16 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         {
             get =>
                 Initialized
-                    ? new BooleanValue(GetEnabled(CoreInstance))
+                    ? new BooleanValue(GetEnabled(_autopilotGetter(MasterMechJeb)))
                     : throw new KOSException("Cannot get Enabled property of not initialized MechJebAscentWrapper");
             set
             {
-                if (Initialized) SetEnabled(CoreInstance, value);
+                if (Initialized) SetEnabled(_autopilotGetter(MasterMechJeb), value);
             }
         }
 
 
-        public int AscentType => GetAscentTypeInteger(_ascentSettings);
+        public int AscentType => GetAscentTypeInteger(_ascentSettingsGetter(MasterMechJeb));
 
         private Func<object, bool> GetEnabled { get; set; }
         private Action<object, bool> SetEnabled { get; set; }

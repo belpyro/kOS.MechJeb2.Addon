@@ -1,5 +1,6 @@
 using System;
 using kOS.MechJeb2.Addon.Core;
+using kOS.MechJeb2.Addon.Utils;
 using kOS.Safe.Encapsulation;
 using kOS.Safe.Encapsulation.Suffixes;
 using kOS.Safe.Utilities;
@@ -10,22 +11,27 @@ namespace kOS.MechJeb2.Addon.Wrapeers
     [KOSNomenclature("BaseWrapper")]
     public abstract class BaseWrapper : Structure, IBaseWrapper, ILogContextProvider
     {
+        private Func<object, object> _getterMasterMechJeb;
         protected object CoreInstance { get; private set; }
+        
+        protected object MasterMechJeb => _getterMasterMechJeb(CoreInstance);
+        
         public bool Initialized { get; protected set; }
 
         public virtual void Initialize(object coreInstance, bool force = false)
         {
             if (Initialized && !force) return;
             CoreInstance = coreInstance;
+            _getterMasterMechJeb = Reflect.On(CoreInstance).Property("MasterMechJeb").AsGetter<object>();
             BindObject();
             RegisterInitializer(InitializeSuffixes);
             Initialized = true;
         }
-        
-        protected void AddSufixInternal(string name, Func<object, double> getter, string description,
+
+        protected void AddSufixInternal(string name, Func<object, double> getter, object o, string description,
             params string[] aliases)
         {
-            var suffix = new NoArgsSuffix<ScalarDoubleValue>(() => getter(CoreInstance), description);
+            var suffix = new NoArgsSuffix<ScalarDoubleValue>(() => getter(o), description);
 
             if (aliases != null && aliases.Length > 0)
             {
@@ -41,20 +47,20 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                 AddSuffix(name, suffix);
             }
         }
-        
-        protected void AddSufixInternal(string name, Delegate getter, string description, params string[] aliases)
+
+        protected void AddSufixInternal(string name, Delegate getter, object o, string description, params string[] aliases)
         {
             ISuffix suffix;
 
             if (getter is Func<object, double> gd)
-                suffix = new NoArgsSuffix<ScalarDoubleValue>(() => gd(CoreInstance), description);
+                suffix = new NoArgsSuffix<ScalarDoubleValue>(() => gd(o), description);
             else if (getter is Func<object, int> gi)
-                suffix = new NoArgsSuffix<ScalarIntValue>(() => gi(CoreInstance), description);
+                suffix = new NoArgsSuffix<ScalarIntValue>(() => gi(o), description);
             else if (getter is Func<object, float> gf)
-                suffix = new NoArgsSuffix<ScalarDoubleValue>(() => gf(CoreInstance),
+                suffix = new NoArgsSuffix<ScalarDoubleValue>(() => gf(o),
                     description); // float → double
             else if (getter is Func<object, string> gs)
-                suffix = new NoArgsSuffix<StringValue>(() => gs(CoreInstance), description);
+                suffix = new NoArgsSuffix<StringValue>(() => gs(o), description);
             else
                 return;
 
@@ -72,8 +78,11 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                 AddSuffix(name, suffix);
             }
         }
-        
-        protected virtual void BindObject(){}
+
+        protected virtual void BindObject()
+        {
+        }
+
         protected abstract void InitializeSuffixes();
         public abstract string context();
     }

@@ -141,104 +141,118 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         private static readonly System.Collections.Generic.Dictionary<MethodInfo, Delegate> _methodCache =
             new System.Collections.Generic.Dictionary<MethodInfo, Delegate>();
 
+        private object Module => MasterMechJeb.GetComputedModule("MechJebModuleInfoItems");
+
         protected override void BindObject()
         {
-             BindInfoItems(CoreInstance.GetType());
+            BindInfoItems(Module.GetType());
         }
 
         protected override void InitializeSuffixes()
         {
             // ===== Maneuver / Node =====
-            AddSufixInternal("NEXTMANEUVERNODEBURNTIME", NextManeuverNodeBurnTime, "Burn time for next maneuver node", "BURN");
-            AddSufixInternal("TIMETOMANEUVERNODE", TimeToManeuverNode, "Time to next maneuver node", "NODEETA");
-            AddSufixInternal("NEXTMANEUVERNODEDELTAV", NextManeuverNodeDeltaV, "Node delta-V", "NODEDV");
+            AddSufixInternal("NEXTMANEUVERNODEBURNTIME", NextManeuverNodeBurnTime, Module,
+                "Burn time for next maneuver node", "BURN");
+            AddSufixInternal("TIMETOMANEUVERNODE", TimeToManeuverNode, Module, "Time to next maneuver node", "NODEETA");
+            AddSufixInternal("NEXTMANEUVERNODEDELTAV", NextManeuverNodeDeltaV, Module, "Node delta-V", "NODEDV");
 
             // ===== TWR / thrust =====
-            AddSufixInternal("SURFACETWR", (Delegate)SurfaceTWR, "Surface TWR", "STWR");
-            AddSufixInternal("LOCALTWR", (Delegate)LocalTWR, "Local TWR", "LTWR");
-            AddSufixInternal("THROTTLETWR", (Delegate)ThrottleTWR, "TWR at current throttle", "TTWR");
-            AddSufixInternal("CURRENTACC", (Delegate)CurrentAcceleration, "Current acceleration", "ACC");
-            AddSufixInternal("CURRENTTHRUST", (Delegate)CurrentThrust, "Current thrust (kN)", "THRUST");
-            AddSufixInternal("MAXTHRUST", (Delegate)MaxThrust, "Max possible thrust", "MAXTH");
-            AddSufixInternal("MINTHRUST", (Delegate)MinThrust, "Minimum engine thrust", "MINTH");
-            AddSufixInternal("MAXACC", (Delegate)MaxAcceleration, "Max acceleration", "MAXACC");
-            AddSufixInternal("MINACC", (Delegate)MinAcceleration, "Minimum acceleration", "MINACC");
-            AddSufixInternal("ACCELERATION", (Delegate)Acceleration, "Net acceleration", "A");
+            AddSufixInternal("SURFACETWR", (Delegate)SurfaceTWR, Module, "Surface TWR", "STWR");
+            AddSufixInternal("LOCALTWR", (Delegate)LocalTWR, Module, "Local TWR", "LTWR");
+            AddSufixInternal("THROTTLETWR", (Delegate)ThrottleTWR, Module, "TWR at current throttle", "TTWR");
+            AddSufixInternal("CURRENTACC", (Delegate)CurrentAcceleration, Module, "Current acceleration", "ACC");
+            AddSufixInternal("CURRENTTHRUST", (Delegate)CurrentThrust, Module, "Current thrust (kN)", "THRUST");
+            AddSufixInternal("MAXTHRUST", (Delegate)MaxThrust, Module, "Max possible thrust", "MAXTH");
+            AddSufixInternal("MINTHRUST", (Delegate)MinThrust, Module, "Minimum engine thrust", "MINTH");
+            AddSufixInternal("MAXACC", (Delegate)MaxAcceleration, Module, "Max acceleration", "MAXACC");
+            AddSufixInternal("MINACC", (Delegate)MinAcceleration, Module, "Minimum acceleration", "MINACC");
+            AddSufixInternal("ACCELERATION", (Delegate)Acceleration, Module, "Net acceleration", "A");
 
             // ===== Atmosphere =====
-            AddSufixInternal("ATMPRESSUREKPA", (Delegate)AtmosphericPressurekPA, "Atmospheric pressure (kPa)", "P_KPA");
-            AddSufixInternal("ATMPRESSURE", (Delegate)AtmosphericPressure, "Atmospheric pressure (atm?)", "P");
-            AddSufixInternal("ATMDESITYDRAG", (Delegate)AtmosphericDrag, "Drag force estimation", "DRAG");
-            AddSufixInternal("DRAGCOEF", (Delegate)DragCoefficient, "Aerodynamic drag coefficient", "CD");
+            AddSufixInternal("ATMPRESSUREKPA", (Delegate)AtmosphericPressurekPA, Module, "Atmospheric pressure (kPa)",
+                "P_KPA");
+            AddSufixInternal("ATMPRESSURE", (Delegate)AtmosphericPressure, Module, "Atmospheric pressure (atm?)", "P");
+            AddSufixInternal("ATMDESITYDRAG", (Delegate)AtmosphericDrag, Module, "Drag force estimation", "DRAG");
+            AddSufixInternal("DRAGCOEF", (Delegate)DragCoefficient, Module, "Aerodynamic drag coefficient", "CD");
 
             // ===== Coordinates =====
-            AddSufixInternal("COORDINATESTRING", GetCoordinateString, "Formatted latitude/longitude", "COORD");
+            AddSufixInternal("COORDINATESTRING", GetCoordinateString, Module, "Formatted latitude/longitude", "COORD");
 
             // ===== Orbit basics =====
-            AddSufixInternal("MEANANOMALY", (Delegate)MeanAnomaly, "Mean anomaly", "MA");
-            AddSufixInternal("CURRENTORBITSUMMARY", CurrentOrbitSummary, "Orbit summary", "ORBSUM");
-            AddSufixInternal("TARGETORBITSUMMARY", TargetOrbitSummary, "Target orbit summary", "TORBSUM");
-            AddSufixInternal("CURRENTORBITSUMMARYINC", CurrentOrbitSummaryWithInclination, "Orbit summary incl.", "ORBSUMINC");
-            AddSufixInternal("TARGETORBITSUMMARYINC", TargetOrbitSummaryWithInclination, "Target orbit summary incl.",
+            AddSufixInternal("MEANANOMALY", (Delegate)MeanAnomaly, Module, "Mean anomaly", "MA");
+            AddSufixInternal("CURRENTORBITSUMMARY", CurrentOrbitSummary, Module, "Orbit summary", "ORBSUM");
+            AddSufixInternal("TARGETORBITSUMMARY", TargetOrbitSummary, Module, "Target orbit summary", "TORBSUM");
+            AddSufixInternal("CURRENTORBITSUMMARYINC", CurrentOrbitSummaryWithInclination, Module,
+                "Orbit summary incl.", "ORBSUMINC");
+            AddSufixInternal("TARGETORBITSUMMARYINC", TargetOrbitSummaryWithInclination, Module,
+                "Target orbit summary incl.",
                 "TORBSUMINC");
-            AddSufixInternal("ORBITALENERGY", (Delegate)OrbitalEnergy, "Specific orbital energy", "ENERGY");
-            AddSufixInternal("POTENTIALENERGY", (Delegate)PotentialEnergy, "Potential orbital energy", "POT");
-            AddSufixInternal("KINETICENERGY", (Delegate)KineticEnergy, "Kinetic energy", "KIN");
-            AddSufixInternal("TIMETOIMPACT", TimeToImpact, "Time until impact", "IMPACT");
-            AddSufixInternal("SUICIDEBURNCOUNTDOWN", SuicideBurnCountdown, "Time until suicide burn", "SBC");
-            AddSufixInternal("TIMETOSOITRANSITION", TimeToSOITransition, "Time to SOI transition", "SOIETA");
-            AddSufixInternal("SURFACEGRAVITY", (Delegate)SurfaceGravity, "Surface gravity", "g");
-            AddSufixInternal("ESCAPEVELOCITY", (Delegate)EscapeVelocity, "Escape velocity", "VESC");
-            AddSufixInternal("CIRCULARORBITSPEED", (Delegate)CircularOrbitSpeed, "Circular orbit velocity", "VCIRC");
+            AddSufixInternal("ORBITALENERGY", (Delegate)OrbitalEnergy, Module, "Specific orbital energy", "ENERGY");
+            AddSufixInternal("POTENTIALENERGY", (Delegate)PotentialEnergy, Module, "Potential orbital energy", "POT");
+            AddSufixInternal("KINETICENERGY", (Delegate)KineticEnergy, Module, "Kinetic energy", "KIN");
+            AddSufixInternal("TIMETOIMPACT", TimeToImpact, Module, "Time until impact", "IMPACT");
+            AddSufixInternal("SUICIDEBURNCOUNTDOWN", SuicideBurnCountdown, Module, "Time until suicide burn", "SBC");
+            AddSufixInternal("TIMETOSOITRANSITION", TimeToSOITransition, Module, "Time to SOI transition", "SOIETA");
+            AddSufixInternal("SURFACEGRAVITY", (Delegate)SurfaceGravity, Module, "Surface gravity", "g");
+            AddSufixInternal("ESCAPEVELOCITY", (Delegate)EscapeVelocity, Module, "Escape velocity", "VESC");
+            AddSufixInternal("CIRCULARORBITSPEED", (Delegate)CircularOrbitSpeed, Module, "Circular orbit velocity",
+                "VCIRC");
 
             // ===== RCS =====
-            AddSufixInternal("RCSTHRUST", (Delegate)RCSThrust, "RCS thrust", "RCSF");
-            AddSufixInternal("RCSTRANSLATIONEFF", RCSTranslationEfficiency, "RCS translation eff", "RCSEFF");
-            AddSufixInternal("RCSDELTAVVAC", (Delegate)RCSDeltaVVacuum, "RCS ΔV vacuum", "RCSDV");
+            AddSufixInternal("RCSTHRUST", (Delegate)RCSThrust, Module, "RCS thrust", "RCSF");
+            AddSufixInternal("RCSTRANSLATIONEFF", RCSTranslationEfficiency, Module, "RCS translation eff", "RCSEFF");
+            AddSufixInternal("RCSDELTAVVAC", (Delegate)RCSDeltaVVacuum, Module, "RCS ΔV vacuum", "RCSDV");
 
             // ===== Angular =====
-            AddSufixInternal("ANGULARVELOCITY", AngularVelocity, "Angular velocity", "ANGVEL");
+            AddSufixInternal("ANGULARVELOCITY", AngularVelocity, Module, "Angular velocity", "ANGVEL");
 
             // ===== Vessel basic =====
-            AddSufixInternal("VESSELNAME", VesselName, "Vessel name", "NAME");
-            AddSufixInternal("VESSELTYPE", VesselType, "Vessel type", "TYPE");
-            AddSufixInternal("VESSELMASS", (Delegate)VesselMass, "Total vessel mass", "MASS");
-            AddSufixInternal("MAXVESSELMASS", MaximumVesselMass, "Maximum vessel mass", "MASSMAX");
-            AddSufixInternal("DRYMASS", (Delegate)DryMass, "Dry mass", "DRYM");
-            AddSufixInternal("LFO_MASS", (Delegate)LiquidFuelAndOxidizerMass, "LFO mass", "LFO");
-            AddSufixInternal("MONOPROP_MASS", (Delegate)MonoPropellantMass, "MonoPropellant mass", "MP");
-            AddSufixInternal("ELECTRICCHARGE", (Delegate)TotalElectricCharge, "Electric charge", "EC");
-            AddSufixInternal("PARTCOUNT", PartCount, "Part count", "PC");
-            AddSufixInternal("MAXPARTCOUNT", MaxPartCount, "Max part count", "PCMAX");
-            AddSufixInternal("PARTCOUNTANDMAX", PartCountAndMaxPartCount, "Part count (with max)", "PCM");
-            AddSufixInternal("STRUTCOUNT", StrutCount, "Strut count", "STRUTS");
-            AddSufixInternal("FUELLINESCOUNT", FuelLinesCount, "Fuel lines count", "LINES");
-            AddSufixInternal("VESSELCOST", (Delegate)VesselCost, "Vessel cost", "COST");
-            AddSufixInternal("CREWCOUNT", CrewCount, "Crew on board", "CREW");
-            AddSufixInternal("CREWCAPACITY", CrewCapacity, "Crew capacity", "CAP");
+            AddSufixInternal("VESSELNAME", VesselName, Module, "Vessel name", "NAME");
+            AddSufixInternal("VESSELTYPE", VesselType, Module, "Vessel type", "TYPE");
+            AddSufixInternal("VESSELMASS", (Delegate)VesselMass, Module, "Total vessel mass", "MASS");
+            AddSufixInternal("MAXVESSELMASS", MaximumVesselMass, Module, "Maximum vessel mass", "MASSMAX");
+            AddSufixInternal("DRYMASS", (Delegate)DryMass, Module, "Dry mass", "DRYM");
+            AddSufixInternal("LFO_MASS", (Delegate)LiquidFuelAndOxidizerMass, Module, "LFO mass", "LFO");
+            AddSufixInternal("MONOPROP_MASS", (Delegate)MonoPropellantMass, Module, "MonoPropellant mass", "MP");
+            AddSufixInternal("ELECTRICCHARGE", (Delegate)TotalElectricCharge, Module, "Electric charge", "EC");
+            AddSufixInternal("PARTCOUNT", PartCount, Module, "Part count", "PC");
+            AddSufixInternal("MAXPARTCOUNT", MaxPartCount, Module, "Max part count", "PCMAX");
+            AddSufixInternal("PARTCOUNTANDMAX", PartCountAndMaxPartCount, Module, "Part count (with max)", "PCM");
+            AddSufixInternal("STRUTCOUNT", StrutCount, Module, "Strut count", "STRUTS");
+            AddSufixInternal("FUELLINESCOUNT", FuelLinesCount, Module, "Fuel lines count", "LINES");
+            AddSufixInternal("VESSELCOST", (Delegate)VesselCost, Module, "Vessel cost", "COST");
+            AddSufixInternal("CREWCOUNT", CrewCount, Module, "Crew on board", "CREW");
+            AddSufixInternal("CREWCAPACITY", CrewCapacity, Module, "Crew capacity", "CAP");
 
             // ===== Target relative motion =====
-            AddSufixInternal("TARGETDISTANCE", TargetDistance, "Distance to target", "TDIST");
-            AddSufixInternal("HEADINGTOTARGET", HeadingToTarget, "Heading to target", "THDG");
-            AddSufixInternal("TARGETRELV", TargetRelativeVelocity, "Relative velocity", "TRELV");
-            AddSufixInternal("TARGETTTCLOSEAPP", TargetTimeToClosestApproach, "ETA to closest approach", "TCA");
-            AddSufixInternal("TARGETCLOSEAPPDIST", TargetClosestApproachDistance, "Closest approach dist", "CADIST");
-            AddSufixInternal("TARGETCLOSEAPPRELV", TargetClosestApproachRelativeVelocity, "Closest rel vel", "CAREL");
+            AddSufixInternal("TARGETDISTANCE", TargetDistance, Module, "Distance to target", "TDIST");
+            AddSufixInternal("HEADINGTOTARGET", HeadingToTarget, Module, "Heading to target", "THDG");
+            AddSufixInternal("TARGETRELV", TargetRelativeVelocity, Module, "Relative velocity", "TRELV");
+            AddSufixInternal("TARGETTTCLOSEAPP", TargetTimeToClosestApproach, Module, "ETA to closest approach", "TCA");
+            AddSufixInternal("TARGETCLOSEAPPDIST", TargetClosestApproachDistance, Module, "Closest approach dist",
+                "CADIST");
+            AddSufixInternal("TARGETCLOSEAPPRELV", TargetClosestApproachRelativeVelocity, Module, "Closest rel vel",
+                "CAREL");
 
             // ===== Biomes =====
-            AddSufixInternal("CURRENTRAWBIOME", CurrentRawBiome, "Raw biome name", "RAWBIOME");
-            AddSufixInternal("CURRENTBIOME", CurrentBiome, "Biome name", "BIOME");
+            AddSufixInternal("CURRENTRAWBIOME", CurrentRawBiome, Module, "Raw biome name", "RAWBIOME");
+            AddSufixInternal("CURRENTBIOME", CurrentBiome, Module, "Biome name", "BIOME");
 
             // ===== Stage data =====
-            AddSufixInternal("STAGEDELTAVVAC", (Delegate)StageDeltaVVacuum, "Stage ΔV vacuum", "SDV");
-            AddSufixInternal("STAGEDELTAVATM", (Delegate)StageDeltaVAtmosphere, "Stage ΔV atmosphere", "SDVATM");
-            AddSufixInternal("STAGEDELTAVATMVAC", StageDeltaVAtmosphereAndVac, "Formatted ΔV atm/vac", "SDVSTR");
-            AddSufixInternal("STAGETIMEFULL", StageTimeLeftFullThrottle, "Stage burn time full throttle", "TBURNF");
-            AddSufixInternal("STAGETIMECURRENT", StageTimeLeftCurrentThrottle, "Stage burn time current throttle", "TBURNC");
-            AddSufixInternal("STAGETIMEHOVER", StageTimeLeftHover, "Stage hover time", "THOVER");
-            AddSufixInternal("TOTALDVVAC", (Delegate)TotalDeltaVVaccum, "Total ΔV vacuum", "TDV");
-            AddSufixInternal("TOTALDVATM", (Delegate)TotalDeltaVAtmosphere, "Total ΔV atmosphere", "TDVATM");
-            AddSufixInternal("TOTALDVATMVAC", TotalDeltaVAtmosphereAndVac, "Formatted total ΔV atm/vac", "TDVSTR");
+            AddSufixInternal("STAGEDELTAVVAC", (Delegate)StageDeltaVVacuum, Module, "Stage ΔV vacuum", "SDV");
+            AddSufixInternal("STAGEDELTAVATM", (Delegate)StageDeltaVAtmosphere, Module, "Stage ΔV atmosphere",
+                "SDVATM");
+            AddSufixInternal("STAGEDELTAVATMVAC", StageDeltaVAtmosphereAndVac, Module, "Formatted ΔV atm/vac",
+                "SDVSTR");
+            AddSufixInternal("STAGETIMEFULL", StageTimeLeftFullThrottle, Module, "Stage burn time full throttle",
+                "TBURNF");
+            AddSufixInternal("STAGETIMECURRENT", StageTimeLeftCurrentThrottle, Module,
+                "Stage burn time current throttle", "TBURNC");
+            AddSufixInternal("STAGETIMEHOVER", StageTimeLeftHover, Module, "Stage hover time", "THOVER");
+            AddSufixInternal("TOTALDVVAC", (Delegate)TotalDeltaVVaccum, Module, "Total ΔV vacuum", "TDV");
+            AddSufixInternal("TOTALDVATM", (Delegate)TotalDeltaVAtmosphere, Module, "Total ΔV atmosphere", "TDVATM");
+            AddSufixInternal("TOTALDVATMVAC", TotalDeltaVAtmosphereAndVac, Module, "Formatted total ΔV atm/vac",
+                "TDVSTR");
         }
 
         public override string context() => nameof(MechJebInfoItemsWrapper);
