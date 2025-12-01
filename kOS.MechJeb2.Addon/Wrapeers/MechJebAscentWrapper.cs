@@ -18,6 +18,12 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         private Func<object, object> _nodeExecutorGetter;
         private Func<object, object> _autopilotGetter;
 
+        // Users pool for proper autopilot engagement (like MechJeb GUI does)
+        private Func<object, object> _usersGetter;
+        private Action<object, object> _usersAdd;
+        private Action<object, object> _usersRemove;
+        private readonly object _userIdentity = new object(); // Sentinel object to identify this wrapper as a user
+
 
         protected override void BindObject()
         {
@@ -35,6 +41,14 @@ namespace kOS.MechJeb2.Addon.Wrapeers
 
             GetEnabled = Member(autopilot, nameof(Enabled)).GetProp<bool>();
             SetEnabled = Member(autopilot, nameof(Enabled)).SetProp<bool>();
+
+            // Bind to Users pool for proper autopilot engagement
+            // MechJeb GUI uses _autopilot.Users.Add(this) to engage, not Enabled = true directly
+            // Note: Users is a field, not a property (public readonly UserPool Users)
+            _usersGetter = Member(autopilot, "Users").GetField<object>();
+            var users = _usersGetter(autopilot);
+            _usersAdd = Reflect.OnType(users.GetType()).Method("Add").WithArgs(typeof(object)).AsAction();
+            _usersRemove = Reflect.OnType(users.GetType()).Method("Remove").WithArgs(typeof(object)).AsAction();
 
             (GetDesiredAltitudeDouble, SetDesiredAltitude) =
                 BindEditable<double>(ascentSettings, "DesiredOrbitAltitude");
@@ -356,7 +370,17 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                     : throw new KOSException("Cannot get Enabled property of not initialized MechJebAscentWrapper");
             set
             {
-                if (Initialized) SetEnabled(_autopilotGetter(MasterMechJeb), value);
+                if (!Initialized) return;
+
+                var autopilot = _autopilotGetter(MasterMechJeb);
+                var users = _usersGetter(autopilot);
+
+                // Use Users.Add/Remove like MechJeb GUI does, instead of setting Enabled directly
+                // This properly engages/disengages the autopilot
+                if (value)
+                    _usersAdd(users, _userIdentity);
+                else
+                    _usersRemove(users, _userIdentity);
             }
         }
 
