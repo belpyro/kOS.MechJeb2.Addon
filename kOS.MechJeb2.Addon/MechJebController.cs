@@ -5,15 +5,10 @@ namespace kOS.MechJeb2.Addon
 {
     public static class MechJebController
     {
-        private static readonly MechJebCoreWrapper _instance = new MechJebCoreWrapper();
+        private static MechJebCoreWrapper _instance;
 
-        public static MechJebCoreWrapper Instance => _instance;
+        public static MechJebCoreWrapper Instance => _instance ??= new MechJebCoreWrapper();
 
-        public static BooleanValue IsAvailable => Instance != null && Instance.Initialized
-                                                                   && Instance.VesselState.Initialized &&
-                                                                   Instance.Ascent.Initialized &&
-                                                                   Instance.InfoItems.Initialized;
-
-        public static void InitWrapper(object initialObj) => _instance.Initialize(initialObj);
+        public static BooleanValue IsAvailable => Instance is { Initialized: true };
     }
 }

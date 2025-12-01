@@ -4,7 +4,7 @@ namespace kOS.MechJeb2.Addon.Core
 {
     public interface IBaseWrapper
     {
-        void Initialize(Object coreInstance);
+        void Initialize(Object coreInstance, bool force = false);
 
         bool Initialized { get; }
     }

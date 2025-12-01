@@ -89,11 +89,12 @@ set asc  to core:ascent.
 
 ### Top-level addon suffixes (`ADDONS:MJ`)
 
-| Suffix      | Type               | Description                                  |
-|-------------|--------------------|----------------------------------------------|
-| `CORE`      | MechJebCoreWrapper | Entry point to all MechJeb-related wrappers  |
-| `AVAILABLE` | Boolean            | True if MechJeb is available for this vessel |
-| `VERSION`   | VersionInfo        | Actual plugin version                        |
+| Suffix      | Type               | Description                                                                 |
+|-------------|--------------------|-----------------------------------------------------------------------------|
+| `CORE`      | MechJebCoreWrapper | Entry point to all MechJeb-related wrappers                                |
+| `INIT`      | Bool / Function    | Manually (re)initializes MechJeb integration. Optional bool argument forces reinit. |
+| `AVAILABLE` | Boolean            | True if MechJeb is available for this vessel                               |
+| `VERSION`   | VersionInfo        | Actual plugin version                                                        |
 
 ```ks
 set mj to addons:mj.
@@ -104,6 +105,12 @@ if not mj:available {
 
 set core to mj:core.
 ```
+
+### Important limitations
+
+- The addon assumes **exactly one MechJeb core module in RUNNING state per vessel**.
+- If multiple MechJebCore modules are present and running on the same vessel, the addon will **refuse to initialize** and `ADDONS:MJ:AVAILABLE` will be `FALSE`.
+- If you use multiple MechJeb parts on a single craft, make sure that only one of them has an active core before using this addon.
 
 ---
 
@@ -391,21 +398,192 @@ print "Biome:          " + info:CURRENTBIOME.
 
 ---
 
-### Ascent autopilot wrapper [WIP] (`ADDONS:MJ:CORE:ASCENT`)
+### Ascent autopilot wrapper (`ADDONS:MJ:CORE:ASCENT`)
 
-Use MechJeb's ascent guidance from kOS.
+This wrapper exposes MechJeb’s **classic ascent guidance only** to kOS.  
+All suffix names are case-insensitive in kOS; here they are shown in UPPERCASE as they are registered.
 
-Common operations:
-- `IsEnabled`
-
-Example:
+#### Getting the wrapper
 
 ```ks
-set asc to addons:mj:core:ascent.
-
-if not asc:isEnabled {
-    print "Engaging MechJeb ascent...".
-}
+set mj   to addons:mj.
+set core to mj:core.
+set asc  to core:ascent.
 ```
 
 ---
+
+#### Basic control
+
+| Suffix       | Alias    | Type   | R/W | Description                                      |
+|--------------|----------|--------|-----|--------------------------------------------------|
+| `ENABLED`    | –        | bool   | R/W | Enable/disable MechJeb ascent autopilot.        |
+| `ASCENTTYPE` | `ASCTYPE`| string | R   | Ascent mode (`CLASSIC` or `NOT SUPPORTED`).     |
+
+---
+
+#### Target orbit (classic)
+
+| Suffix               | Alias   | Type   | R/W | Description                              |
+|----------------------|---------|--------|-----|------------------------------------------|
+| `DESIREDALTITUDE`    | `DSRALT`| number | R/W | Desired orbit altitude (m).             |
+| `DESIREDINCLINATION` | `INC`   | number | R/W | Desired orbital inclination (degrees).  |
+
+---
+
+#### Turn profile (gravity turn)
+
+| Suffix               | Alias      | Type   | R/W | Description                                       |
+|----------------------|------------|--------|-----|---------------------------------------------------|
+| `TURNSTARTALTITUDE`  | `STARTALT` | number | R/W | Altitude to start gravity turn (m).              |
+| `TURNSTARTVELOCITY`  | `STARTV`   | number | R/W | Velocity to start gravity turn (m/s).            |
+| `TURNENDALTITUDE`    | `ENDALT`   | number | R/W | Altitude to finish gravity turn (m).             |
+| `TURNENDANGLE`       | `ENDANG`   | number | R/W | Pitch angle at end of gravity turn (degrees).    |
+| `TURNSHAPEEXPONENT`  | `TSHAPEEXP`| number | R/W | Turn shape exponent (0–1, clamped).              |
+| `AUTOPATH`           | –          | bool   | R/W | Automatically compute turn profile (AutoPath).   |
+
+---
+
+#### Roll profile
+
+| Suffix          | Alias     | Type   | R/W | Description                                      |
+|-----------------|-----------|--------|-----|--------------------------------------------------|
+| `FORCEROLL`     | `FROLL`   | bool   | R/W | Force roll during ascent.                        |
+| `VERTICALROLL`  | `VROLL`   | number | R/W | Roll angle during vertical ascent (degrees).     |
+| `TURNROLL`      | `TROLL`   | number | R/W | Roll angle during gravity turn (degrees).        |
+| `ROLLALTITUDE`  | `ROLLALT` | number | R/W | Altitude where roll is applied (m).              |
+
+---
+
+#### Corrective steering
+
+| Suffix                  | Alias        | Type   | R/W | Description                               |
+|-------------------------|--------------|--------|-----|-------------------------------------------|
+| `CORRECTIVESTEERING`    | `CSTEER`     | bool   | R/W | Enable classic corrective steering.       |
+| `CORRECTIVESTEERINGGAIN`| `CSTEERGAIN` | number | R/W | Corrective steering gain (multiplier).    |
+
+---
+
+#### AoA & dynamic pressure limits
+
+| Suffix                     | Alias      | Type   | R/W | Description                                             |
+|----------------------------|------------|--------|-----|---------------------------------------------------------|
+| `LIMITAOA`                 | `LIMAOA`   | bool   | R/W | Enable angle-of-attack limit.                          |
+| `MAXAOA`                   | –          | number | R/W | Maximum allowed AoA (degrees).                         |
+| `AOALIMITFADEOUTPRESSURE`  | `AOAFADEQ` | number | R/W | Pressure (Q) where AoA limit fades out.                |
+| `LIMITQA`                  | `LIMQA`    | number | R/W | Dynamic pressure limit (Q).                            |
+| `LIMITQAENABLED`           | `LIMQAEN`  | bool   | R/W | Enable dynamic pressure limit (Q).                     |
+| `LIMITTOPREVENTOVERHEATS`  | `LIMOVHT`  | bool   | R/W | Limit thrust to prevent engine overheating.            |
+
+---
+
+#### Circularization & QoL
+
+| Suffix                | Alias     | Type | R/W | Description                                   |
+|-----------------------|-----------|------|-----|-----------------------------------------------|
+| `SKIPCIRCULARIZATION` | `SKIPCIRC`| bool | R/W | Skip circularization burn at apoapsis.        |
+
+---
+
+#### Autostage (core toggle)
+
+| Suffix      | Alias | Type | R/W | Description                                |
+|-------------|-------|------|-----|--------------------------------------------|
+| `AUTOSTAGE` | –     | bool | R/W | Enable MechJeb autostaging for ascent.     |
+
+---
+
+#### Autostage settings (staging controller)
+
+| Suffix                   | Alias        | Type   | R/W | Description                                         |
+|--------------------------|--------------|--------|-----|-----------------------------------------------------|
+| `AUTOSTAGELIMIT`         | `ASTGLIM`    | int    | R/W | Maximum number of stages to auto-stage.            |
+| `AUTOSTAGEPREDELAY`      | `ASTGPRE`    | number | R/W | Delay before staging (seconds).                    |
+| `AUTOSTAGEPOSTDELAY`     | `ASTGPOST`   | number | R/W | Delay after staging (seconds).                     |
+| `CLAMPAUTOSTAGETHRUSTPCT`| `CLAMPTHRUST`| number | R/W | Minimum thrust fraction for autostage (0–1, clamped). |
+
+---
+
+#### Fairing jettison conditions
+
+| Suffix                     | Alias     | Type   | R/W | Description                                       |
+|----------------------------|-----------|--------|-----|---------------------------------------------------|
+| `FAIRINGMAXDYNAMICPRESSURE`| `FMAXQ`   | number | R/W | Maximum dynamic pressure for fairing jettison.    |
+| `FAIRINGMINALTITUDE`       | `FMINALT` | number | R/W | Minimum altitude for fairing jettison (m).        |
+| `FAIRINGMAXAEROTHERMALFLUX`| `FMAXFLUX`| number | R/W | Maximum aerothermal flux for fairing jettison.    |
+
+---
+
+#### Hot staging & solids
+
+| Suffix               | Alias      | Type   | R/W | Description                                      |
+|----------------------|------------|--------|-----|--------------------------------------------------|
+| `HOTSTAGING`         | `HOTSTAGE` | bool   | R/W | Enable hot staging.                              |
+| `HOTSTAGINGLEADTIME` | `HOTLEAD`  | number | R/W | Hot staging lead time (seconds).                 |
+| `DROPSOLIDS`         | `DRPSLD`   | bool   | R/W | Enable dropping of solid boosters.               |
+| `DROPSOLIDSLEADTIME` | `SLDSLEAD` | number | R/W | Lead time before dropping solids (seconds).      |
+
+---
+
+#### Autodeploy (antennas & panels)
+
+| Suffix                  | Alias      | Type | R/W | Description                                      |
+|-------------------------|------------|------|-----|--------------------------------------------------|
+| `AUTODEPLOYANTENNAS`    | `AUTODANT` | bool | R/W | Automatically deploy antennas after launch.      |
+| `AUTODEPLOYSOLARPANELS` | `AUTODSOL` | bool | R/W | Automatically deploy solar panels after launch.  |
+
+---
+
+#### Node execution helper
+
+| Suffix    | Alias  | Type | R/W | Description                                          |
+|-----------|--------|------|-----|------------------------------------------------------|
+| `AUTOWARP`| `AWARP`| bool | R/W | Enable automatic time warp for maneuver execution.   |
+
+---
+
+#### Example: classic RP-1 style ascent
+
+```ks
+set mj   to addons:mj.
+set core to mj:core.
+set asc  to core:ascent.
+
+// Basic target orbit
+set asc:desiredaltitude    to 250000.
+set asc:desiredinclination to 51.6.
+
+// Turn profile
+set asc:turnstartaltitude  to 1500.
+set asc:turnendaltitude    to 70000.
+set asc:turnendangle       to 0.
+set asc:turnshapeexponent  to 0.4.
+
+// Roll profile
+set asc:forceroll    to true.
+set asc:verticalroll to 0.
+set asc:turnroll     to 0.
+
+// Safety limits
+set asc:limitaoa                to true.
+set asc:maxaoa                  to 5.
+set asc:limitqaenabled          to true.
+set asc:limitqa                 to 45000.
+set asc:limittopreventoverheats to true.
+
+// Autostage & fairings
+set asc:autostage                 to true.
+set asc:autostagelimit            to 5.
+set asc:autostagepredelay         to 0.5.
+set asc:autostagepostdelay        to 0.5.
+set asc:fairingmaxdynamicpressure to 25000.
+set asc:fairingminaltitude        to 30000.
+
+// QoL features
+set asc:autodeployantennas    to true.
+set asc:autodeploysolarpanels to true.
+set asc:skipcircularization   to false.
+set asc:autowarp              to true.
+
+// Engage ascent guidance from MechJeb GUI, then let kOS tweak settings on the fly.
+```

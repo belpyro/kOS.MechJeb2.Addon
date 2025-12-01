@@ -12,7 +12,7 @@ namespace kOS.MechJeb2.Addon.Utils
         private static readonly BindingFlags CoreFlags =
             BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase;
 
-        // кэш (оптимизация, чтобы не гонять GetProperties/GetField каждый раз)
+        //local cache
         private static readonly Dictionary<(Type wrapperType, Type coreType), PropertyInfo[]> _ifacePropsCache
             = new Dictionary<(Type, Type), PropertyInfo[]>();
 
@@ -44,15 +44,13 @@ namespace kOS.MechJeb2.Addon.Utils
 
                 var wrapperPropType = wrapperProp.PropertyType;
 
-                // 1) Примитивы / делегаты
                 if (typeof(Delegate).IsAssignableFrom(wrapperPropType))
                 {
-                    var del = coreMember.BuildTypedGetter(); // Func<object,bool>/double/... как у тебя
+                    var del = coreMember.BuildTypedGetter();
                     wrapperProp.SetValue(wrapper, del, null);
                     continue;
                 }
 
-                // 2) Вложенный враппер
                 if (typeof(IBaseWrapper).IsAssignableFrom(wrapperPropType))
                 {
                     var nested = wrapperProp.GetValue(wrapper, null) as IBaseWrapper;
