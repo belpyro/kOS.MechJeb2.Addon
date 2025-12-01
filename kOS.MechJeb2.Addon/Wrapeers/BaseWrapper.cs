@@ -85,5 +85,32 @@ namespace kOS.MechJeb2.Addon.Wrapeers
 
         protected abstract void InitializeSuffixes();
         public abstract string context();
+        
+        protected MemberBinder Member(object target, string name)
+            => new MemberBinder(target, name);
+
+        protected class MemberBinder
+        {
+            private readonly object _target;
+            private readonly string _name;
+
+            public MemberBinder(object target, string name)
+            {
+                _target = target;
+                _name = name;
+            }
+
+            public Func<object, T> GetField<T>()
+                => Reflect.On(_target).Field(_name).AsGetter<T>();
+
+            public Action<object, T> SetField<T>()
+                => Reflect.On(_target).Field(_name).AsSetter<T>();
+
+            public Func<object, T> GetProp<T>()
+                => Reflect.On(_target).Property(_name).AsGetter<T>();
+
+            public Action<object, T> SetProp<T>()
+                => Reflect.On(_target).Property(_name).AsSetter<T>();
+        }
     }
 }

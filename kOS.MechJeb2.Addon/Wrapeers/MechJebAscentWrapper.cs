@@ -24,20 +24,19 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         private Action<object, object> _usersRemove;
         private readonly object _userIdentity = new object(); // Sentinel object to identify this wrapper as a user
 
-
         protected override void BindObject()
         {
             _ascentSettingsGetter = Member(MasterMechJeb, "AscentSettings").GetField<object>();
             _stagingControllerGetter = Member(MasterMechJeb, "Staging").GetField<object>();
             _thrustControllerGetter = Member(MasterMechJeb, "Thrust").GetField<object>();
-            _nodeExecutorGetter = Member(MasterMechJeb, "Node").GetField<object>();  
-            _autopilotGetter = Member(MasterMechJeb, "Ascent").GetProp<object>();  
-            
+            _nodeExecutorGetter = Member(MasterMechJeb, "Node").GetField<object>();
+            _autopilotGetter = Member(MasterMechJeb, "Ascent").GetProp<object>();
+
             var ascentSettings = _ascentSettingsGetter(MasterMechJeb);
             var stagingController = _stagingControllerGetter(MasterMechJeb);
             var thrustController = _thrustControllerGetter(MasterMechJeb);
             var nodeExecutor = _nodeExecutorGetter(MasterMechJeb);
-            var autopilot =  _autopilotGetter(MasterMechJeb);
+            var autopilot = _autopilotGetter(MasterMechJeb);
 
             GetEnabled = Member(autopilot, nameof(Enabled)).GetProp<bool>();
             SetEnabled = Member(autopilot, nameof(Enabled)).SetProp<bool>();
@@ -105,7 +104,7 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                 BindEditable<double>(stagingController, "DropSolidsLeadTime");
             (GetClampAutoStageThrustPct, SetClampAutoStageThrustPct) =
                 BindEditable<double>(stagingController, "ClampAutoStageThrustPct");
-            
+
             // --- NEW: Desired inclination (EditableDoubleMult DesiredInclination)
             (GetDesiredInclinationDouble, SetDesiredInclination) =
                 BindEditable<double>(ascentSettings, "DesiredInclination");
@@ -139,16 +138,16 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                 BindEditable<double>(ascentSettings, "AOALimitFadeoutPressure");
 
             (GetLimitQaDouble, SetLimitQa) =
-                BindEditable<double>(thrustController,"MaxDynamicPressure");
+                BindEditable<double>(thrustController, "MaxDynamicPressure");
 
             GetLimitQaEnabled = Member(thrustController, "LimitDynamicPressure").GetField<bool>();
             SetLimitQaEnabled = Member(thrustController, "LimitDynamicPressure").SetField<bool>();
-            
+
             GetLimitToPreventOverheats = Member(thrustController, "LimitToPreventOverheats").GetField<bool>();
             SetLimitToPreventOverheats = Member(thrustController, "LimitToPreventOverheats").SetField<bool>();
-            
-            GetAutoWarp =  Member(nodeExecutor, "AutoWarp").GetField<bool>();
-            SetAutoWarp =  Member(nodeExecutor, "AutoWarp").SetField<bool>();
+
+            GetAutoWarp = Member(nodeExecutor, "AutoWarp").GetField<bool>();
+            SetAutoWarp = Member(nodeExecutor, "AutoWarp").SetField<bool>();
         }
 
         protected override void InitializeSuffixes()
@@ -176,8 +175,10 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                     value => SetTurnEndAngle(_ascentSettingsGetter(MasterMechJeb), value),
                     "Turn End Angle"));
             AddSuffix(new[] { "TURNSHAPEEXPONENT", "TSHAPEEXP" },
-                new ClampSetSuffix<ScalarDoubleValue>(() => GetTurnShapeExponentDouble(_ascentSettingsGetter(MasterMechJeb)),
-                    value => SetTurnShapeExponent(_ascentSettingsGetter(MasterMechJeb), value), min: 0, max: 1, stepIncrement: 0f,
+                new ClampSetSuffix<ScalarDoubleValue>(
+                    () => GetTurnShapeExponentDouble(_ascentSettingsGetter(MasterMechJeb)),
+                    value => SetTurnShapeExponent(_ascentSettingsGetter(MasterMechJeb), value), min: 0, max: 1,
+                    stepIncrement: 0f,
                     "Turn Shape Exponent"));
             AddSuffix(new[] { "AUTOPATH" },
                 new SetSuffix<BooleanValue>(() => GetAutoPath(_ascentSettingsGetter(MasterMechJeb)),
@@ -269,7 +270,7 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                     value => SetClampAutoStageThrustPct(_stagingControllerGetter(MasterMechJeb), value),
                     min: 0, max: 1, stepIncrement: 0f,
                     "Minimum thrust percent required to auto-stage"));
-             // --- Classic orbit target: inclination ---
+            // --- Classic orbit target: inclination ---
             AddSuffix(new[] { "DESIREDINCLINATION", "INC" },
                 new SetSuffix<ScalarDoubleValue>(
                     () => GetDesiredInclinationDouble(_ascentSettingsGetter(MasterMechJeb)),
@@ -344,7 +345,7 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                     () => GetLimitQaEnabled(_thrustControllerGetter(MasterMechJeb)),
                     value => SetLimitQaEnabled(_thrustControllerGetter(MasterMechJeb), value),
                     "Enable dynamic pressure limit (Q)"));
-            
+
             // --- Thrust controller safety limits ---
             AddSuffix(new[] { "LIMITTOPREVENTOVERHEATS", "LIMOVHT" },
                 new SetSuffix<BooleanValue>(
@@ -482,7 +483,7 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         // Clamp AutoStage Thrust (EditableDouble ClampAutoStageThrustPct)
         public Func<object, double> GetClampAutoStageThrustPct { get; set; }
         public Action<object, double> SetClampAutoStageThrustPct { get; set; }
-        
+
         // Desired inclination
         private Func<object, double> GetDesiredInclinationDouble { get; set; }
         private Action<object, double> SetDesiredInclination { get; set; }
@@ -522,7 +523,7 @@ namespace kOS.MechJeb2.Addon.Wrapeers
 
         private Func<object, bool> GetLimitQaEnabled { get; set; }
         private Action<object, bool> SetLimitQaEnabled { get; set; }
-        
+
         //LimitToPreventOverheats
         private Func<object, bool> GetLimitToPreventOverheats { get; set; }
         private Action<object, bool> SetLimitToPreventOverheats { get; set; }
@@ -543,33 +544,6 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                 .AsSetter<T>();
 
             return (ctx => getterDouble(getterObj(ctx)), (ctx, val) => setVal(getterObj(ctx), val));
-        }
-
-        private MemberBinder Member(object target, string name)
-            => new MemberBinder(target, name);
-
-        private class MemberBinder
-        {
-            private readonly object _target;
-            private readonly string _name;
-
-            public MemberBinder(object target, string name)
-            {
-                _target = target;
-                _name = name;
-            }
-
-            public Func<object, T> GetField<T>()
-                => Reflect.On(_target).Field(_name).AsGetter<T>();
-
-            public Action<object, T> SetField<T>()
-                => Reflect.On(_target).Field(_name).AsSetter<T>();
-
-            public Func<object, T> GetProp<T>()
-                => Reflect.On(_target).Property(_name).AsGetter<T>();
-
-            public Action<object, T> SetProp<T>()
-                => Reflect.On(_target).Property(_name).AsSetter<T>();
         }
     }
 }

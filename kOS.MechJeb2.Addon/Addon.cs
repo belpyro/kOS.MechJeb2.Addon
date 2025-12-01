@@ -41,7 +41,7 @@ namespace kOS.MechJeb2.Addon
         private void InitializeSuffixes()
         {
             Log.Debug("Initializing kOS suffixes for MJAddon");
-            this.AddSuffix("CORE",
+            AddSuffix("CORE",
                 new NoArgsSuffix<MechJebCoreWrapper>(() =>
                     Available()
                         ? MechJebController.Instance
@@ -51,7 +51,7 @@ namespace kOS.MechJeb2.Addon
             AddSuffix("INIT",
                 new OneArgsSuffix<BooleanValue>((val) => TryInitializeMechJebCore(val),
                     "Manually (re)initializes the MechJeb core wrapper. Pass TRUE to force reinitialization."));
-            this.AddSuffix("VERSION",
+            AddSuffix("VERSION",
                 new NoArgsSuffix<VersionInfo>(GetVersionInfo,
                     "Returns the kOS.MechJeb2.Addon version (major.minor.patch.build)."));
         }
