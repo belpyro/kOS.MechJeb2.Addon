@@ -257,7 +257,6 @@ namespace kOS.MechJeb2.Addon.Utils
             var callArgs = new List<Expression>();
             var outVars = new List<ParameterExpression>();
 
-            // Разбираем параметры метода
             for (int i = 0; i < argsInfo.Length; i++)
             {
                 var p = argsInfo[i];
@@ -269,7 +268,7 @@ namespace kOS.MechJeb2.Addon.Utils
                     var varExpr = Expression.Variable(elementType, p.Name ?? ("out" + i));
                     locals.Add(varExpr);
                     outVars.Add(varExpr);
-                    callArgs.Add(varExpr); // ref/out передаём саму переменную
+                    callArgs.Add(varExpr); 
                 }
                 else
                 {
@@ -287,7 +286,6 @@ namespace kOS.MechJeb2.Addon.Utils
 
             Expression body;
 
-            // Случай 0: нет out-параметров
             if (outVars.Count == 0)
             {
                 if (method.ReturnType == typeof(void))
@@ -307,10 +305,8 @@ namespace kOS.MechJeb2.Addon.Utils
                 return Expression.Lambda<Func<object[], object>>(body, arrParam).Compile();
             }
 
-            // Тут outVars.Count == 1
             var outVar = outVars[0];
-
-            // Случай 1: есть out, но метод void → как раньше: возвращаем только out
+            
             if (method.ReturnType == typeof(void))
             {
                 // { TOut outVar; call; return (object)outVar; }
@@ -323,9 +319,9 @@ namespace kOS.MechJeb2.Addon.Utils
                 return Expression.Lambda<Func<object[], object>>(body, arrParam).Compile();
             }
 
-            // Случай 2: есть out и есть результат → возвращаем (result, outVar) как ValueTuple
+            
             var resultVar = Expression.Variable(method.ReturnType, "result");
-            locals.Insert(0, resultVar); // чтобы result тоже был локалом
+            locals.Insert(0, resultVar); 
 
             var assignResult = Expression.Assign(resultVar, callExpr);
 

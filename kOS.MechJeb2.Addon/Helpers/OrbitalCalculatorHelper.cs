@@ -20,7 +20,7 @@ namespace kOS.MechJeb2.Addon.Helpers
             public MethodInfo Method { get; set; }
             public Func<object[], object> Invoker { get; set; }
 
-            // Типы "входных" параметров – только тех, которые реально приходят через object[] args
+            // Input parameter types – only those actually passed through object[] args
             public Type[] InputTypes { get; set; }
         }
 
@@ -57,13 +57,13 @@ namespace kOS.MechJeb2.Addon.Helpers
                     {
                         var paramInfos = m.GetParameters();
 
-                        // "Внешние" параметры = все, кроме out
+                        // External parameters = all except out
                         var inputTypes = paramInfos
                             .Where(p => !p.IsOut)
                             .Select(p =>
                             {
                                 var t = p.ParameterType;
-                                // ref T → берём T
+                                // ref T → take T
                                 return t.IsByRef ? t.GetElementType()! : t;
                             })
                             .ToArray();
@@ -71,7 +71,7 @@ namespace kOS.MechJeb2.Addon.Helpers
                         return new MethodOverload
                         {
                             Method = m,
-                            Invoker = m.MakeStaticMethodWithArgs(), // твой уже существующий биндер
+                            Invoker = m.MakeStaticMethodWithArgs(),
                             InputTypes = inputTypes
                         };
                     }).ToList()
@@ -164,7 +164,7 @@ namespace kOS.MechJeb2.Addon.Helpers
         {
             try
             {
-                // returns Vector3d and out var double
+                // returns Vector3d and an out double
                 var result =
                     InternalMethodExecute<ValueTuple<Vector3d, double>>(nameof(DeltaVAndTimeToMatchPlanesAscending), o,
                         target,
@@ -186,7 +186,7 @@ namespace kOS.MechJeb2.Addon.Helpers
         {
             try
             {
-                // returns Vector3d and out var double
+                // returns Vector3d and an out double
                 var result =
                     InternalMethodExecute<ValueTuple<Vector3d, double>>(nameof(DeltaVAndTimeToMatchPlanesDescending), o,
                         target,
@@ -321,7 +321,7 @@ namespace kOS.MechJeb2.Addon.Helpers
                     }
                     else if (!expected.IsInstanceOfType(arg))
                     {
-                        // Можно усложнить логикой Convert.ChangeType / IsAssignableFrom, но базово так
+                        // Could be extended using Convert.ChangeType / IsAssignableFrom, but this basic check is enough
                         match = false;
                         break;
                     }
@@ -330,7 +330,7 @@ namespace kOS.MechJeb2.Addon.Helpers
                 if (!match)
                     continue;
 
-                // Нашли нужную перегрузку → вызываем её
+                // Found matching overload → invoke it
                 var result = overload.Invoker(args);
                 return (T)result;
             }
