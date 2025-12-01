@@ -54,6 +54,7 @@
         <Compile Include="Core\IInfoItemsWrapper.cs"/>
         <Compile Include="Core\IMechJebAscentWrapper.cs"/>
         <Compile Include="Core\IMechJebCoreWrapper.cs"/>
+        <Compile Include="Core\IMechJebLandingAutopilotWrapper.cs"/>
         <Compile Include="Core\IVesselStateWrapper.cs"/>
         <Compile Include="kOS\PredicatedSetSuffix.cs"/>
         <Compile Include="MechJebController.cs"/>
@@ -66,6 +67,7 @@
         <Compile Include="Wrapeers\MechJebAscentWrapper.cs"/>
         <Compile Include="Wrapeers\MechJebCoreWrapper.cs"/>
         <Compile Include="Wrapeers\MechJebInfoItemsWrapper.cs"/>
+        <Compile Include="Wrapeers\MechJebLandingAutopilotWrapper.cs"/>
         <Compile Include="Wrapeers\VesselStateWrapper.cs"/>
     </ItemGroup>
     <ItemGroup>

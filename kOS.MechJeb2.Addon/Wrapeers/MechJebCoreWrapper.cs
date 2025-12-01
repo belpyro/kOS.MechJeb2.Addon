@@ -14,6 +14,10 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         private MechJebAscentWrapper _ascentWrapper;
         private VesselStateWrapper _vesselStateWrapper;
         private MechJebInfoItemsWrapper _infoItemsWrapper;
+        private MechJebLandingAutopilotWrapper _landingWrapper;
+
+        // Override MasterMechJeb: for the core wrapper, CoreInstance IS the MasterMechJeb
+        protected new object MasterMechJeb => CoreInstance;
 
         public MechJebAscentWrapper Ascent
         {
@@ -44,7 +48,18 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                 _infoItemsWrapper = new MechJebInfoItemsWrapper();
                 _infoItemsWrapper.Initialize(this.MasterMechJeb);
                 return _infoItemsWrapper;
-            } } 
+            } }
+
+        [ComputedModule("MechJebModuleLandingAutopilot")]
+        public MechJebLandingAutopilotWrapper Landing {
+            get
+            {
+                if(_landingWrapper != null) return _landingWrapper;
+                _landingWrapper = new MechJebLandingAutopilotWrapper();
+                _landingWrapper.Initialize(this.MasterMechJeb);
+                return _landingWrapper;
+            }
+        }
 
         public Func<object, bool> Running { get; internal set; }
 
@@ -53,6 +68,7 @@ namespace kOS.MechJeb2.Addon.Wrapeers
             this.AddSuffix(new[] { "VESSEL", "VESSELINFO" }, new NoArgsSuffix<VesselStateWrapper>(() => VesselState));
             this.AddSuffix(new[] { "ASCENT", "ASCENTGUIDANCE" }, new NoArgsSuffix<MechJebAscentWrapper>(() => Ascent));
             this.AddSuffix(new[] { "INFO" }, new NoArgsSuffix<MechJebInfoItemsWrapper>(() => InfoItems));
+            this.AddSuffix(new[] { "LANDING", "LANDINGAUTOPILOT" }, new NoArgsSuffix<MechJebLandingAutopilotWrapper>(() => Landing));
             this.AddSuffix(new[] { "RUNNING" }, new NoArgsSuffix<BooleanValue>(() => Running(MasterMechJeb)));
         }
 
