@@ -14,6 +14,11 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         private MechJebAscentWrapper _ascentWrapper;
         private VesselStateWrapper _vesselStateWrapper;
         private MechJebInfoItemsWrapper _infoItemsWrapper;
+        private MechJebNodeExecutorWrapper _nodeExecutorWrapper;
+        private MechJebManeuverPlannerWrapper _maneuverPlannerWrapper;
+
+        // Override MasterMechJeb: for the core wrapper, CoreInstance IS the MasterMechJeb
+        protected new object MasterMechJeb => CoreInstance;
 
         public MechJebAscentWrapper Ascent
         {
@@ -44,7 +49,27 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                 _infoItemsWrapper = new MechJebInfoItemsWrapper();
                 _infoItemsWrapper.Initialize(this.MasterMechJeb);
                 return _infoItemsWrapper;
-            } } 
+            } }
+
+        [ComputedModule("MechJebModuleNodeExecutor")]
+        public MechJebNodeExecutorWrapper NodeExecutor {
+            get
+            {
+                if(_nodeExecutorWrapper != null) return _nodeExecutorWrapper;
+                _nodeExecutorWrapper = new MechJebNodeExecutorWrapper();
+                _nodeExecutorWrapper.Initialize(this.MasterMechJeb);
+                return _nodeExecutorWrapper;
+            } }
+
+        [ComputedModule("MechJebModuleManeuverPlanner")]
+        public MechJebManeuverPlannerWrapper ManeuverPlanner {
+            get
+            {
+                if(_maneuverPlannerWrapper != null) return _maneuverPlannerWrapper;
+                _maneuverPlannerWrapper = new MechJebManeuverPlannerWrapper();
+                _maneuverPlannerWrapper.Initialize(this.MasterMechJeb);
+                return _maneuverPlannerWrapper;
+            } }
 
         public Func<object, bool> Running { get; internal set; }
 
@@ -53,6 +78,8 @@ namespace kOS.MechJeb2.Addon.Wrapeers
             this.AddSuffix(new[] { "VESSEL", "VESSELINFO" }, new NoArgsSuffix<VesselStateWrapper>(() => VesselState));
             this.AddSuffix(new[] { "ASCENT", "ASCENTGUIDANCE" }, new NoArgsSuffix<MechJebAscentWrapper>(() => Ascent));
             this.AddSuffix(new[] { "INFO" }, new NoArgsSuffix<MechJebInfoItemsWrapper>(() => InfoItems));
+            this.AddSuffix(new[] { "NODE", "NODEEXECUTOR" }, new NoArgsSuffix<MechJebNodeExecutorWrapper>(() => NodeExecutor));
+            this.AddSuffix(new[] { "PLANNER", "MANEUVERPLANNER" }, new NoArgsSuffix<MechJebManeuverPlannerWrapper>(() => ManeuverPlanner));
             this.AddSuffix(new[] { "RUNNING" }, new NoArgsSuffix<BooleanValue>(() => Running(MasterMechJeb)));
         }
 

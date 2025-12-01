@@ -54,6 +54,8 @@
         <Compile Include="Core\IInfoItemsWrapper.cs"/>
         <Compile Include="Core\IMechJebAscentWrapper.cs"/>
         <Compile Include="Core\IMechJebCoreWrapper.cs"/>
+        <Compile Include="Core\IMechJebManeuverPlannerWrapper.cs"/>
+        <Compile Include="Core\IMechJebNodeExecutorWrapper.cs"/>
         <Compile Include="Core\IVesselStateWrapper.cs"/>
         <Compile Include="kOS\PredicatedSetSuffix.cs"/>
         <Compile Include="MechJebController.cs"/>
@@ -66,6 +68,8 @@
         <Compile Include="Wrapeers\MechJebAscentWrapper.cs"/>
         <Compile Include="Wrapeers\MechJebCoreWrapper.cs"/>
         <Compile Include="Wrapeers\MechJebInfoItemsWrapper.cs"/>
+        <Compile Include="Wrapeers\MechJebManeuverPlannerWrapper.cs"/>
+        <Compile Include="Wrapeers\MechJebNodeExecutorWrapper.cs"/>
         <Compile Include="Wrapeers\VesselStateWrapper.cs"/>
     </ItemGroup>
     <ItemGroup>
