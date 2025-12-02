@@ -8,6 +8,7 @@ namespace kOS.MechJeb2.Addon.Core
         MechJebAscentWrapper Ascent { get; }
         VesselStateWrapper  VesselState { get; }
         MechJebInfoItemsWrapper InfoItems { get; }
+        MechJebLandingAutopilotWrapper Landing { get; }
         Func<object, bool> Running { get; }
     }
 }
