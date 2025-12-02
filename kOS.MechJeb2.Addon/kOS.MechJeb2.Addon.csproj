@@ -97,6 +97,8 @@
     <Import Project="..\packages\KSPBuildTools.0.0.5\build\KSPBuildTools.targets" Condition="Exists('..\packages\KSPBuildTools.0.0.5\build\KSPBuildTools.targets')"/>
     <PropertyGroup>
         <ModVersion>0.0.1</ModVersion>
+        <BinariesOutputRelativePath>GameData/kOS.MechJeb2.Addon</BinariesOutputRelativePath>
+        <RepoRootPath>$(MSBuildProjectDirectory)/..</RepoRootPath>
     </PropertyGroup>
     <Target Name="ResolveVersionFromGit" BeforeTargets="Build">
         <Exec Command="git describe --tags --abbrev=0 --match &quot;v[0-9]*&quot;"
