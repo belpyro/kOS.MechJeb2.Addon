@@ -17,9 +17,6 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         private MechJebNodeExecutorWrapper _nodeExecutorWrapper;
         private MechJebManeuverPlannerWrapper _maneuverPlannerWrapper;
 
-        // Override MasterMechJeb: for the core wrapper, CoreInstance IS the MasterMechJeb
-        protected new object MasterMechJeb => CoreInstance;
-
         public MechJebAscentWrapper Ascent
         {
             get
