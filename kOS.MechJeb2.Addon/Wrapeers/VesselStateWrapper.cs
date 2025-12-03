@@ -5,6 +5,8 @@ using kOS.MechJeb2.Addon.Attributes;
 using kOS.MechJeb2.Addon.Core;
 using kOS.MechJeb2.Addon.Utils;
 using kOS.Safe.Utilities;
+using kOS.Safe.Encapsulation;
+using kOS.Safe.Encapsulation.Suffixes;
 
 namespace kOS.MechJeb2.Addon.Wrapeers
 {
@@ -39,100 +41,234 @@ namespace kOS.MechJeb2.Addon.Wrapeers
 
         protected override void InitializeSuffixes()
         {
+            var getInfo = new Func<object>(() => VesselInfo);
+
             // Time & gravity
-            AddSufixInternal("TIME", Time, VesselInfo, "Universal time in seconds", "T");
-            AddSufixInternal("LOCALG", LocalG, VesselInfo, "Local gravitational acceleration in m/s^2", "G");
+            AddSuffix(new[] { "TIME", "T" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(Time(getInfo())),
+                    "Universal time in seconds"));
+
+            AddSuffix(new[] { "LOCALG", "G" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(LocalG(getInfo())),
+                    "Local gravitational acceleration in m/s^2"));
 
             // Velocities
-            AddSufixInternal("SPEEDORBITAL", SpeedOrbital, VesselInfo,
-                "Orbital speed relative to the reference body (m/s)",
-                "ORBVEL");
-            AddSufixInternal("SPEEDSURFACE", SpeedSurface, VesselInfo,
-                "Surface speed relative to the rotating body (m/s)",
-                "SURFVEL");
-            AddSufixInternal("SPEEDVERTICAL", SpeedVertical, VesselInfo, "Vertical component of surface velocity (m/s)",
-                "VERTVEL");
-            AddSufixInternal("SPEEDSURFACEHORIZONTAL", SpeedSurfaceHorizontal, VesselInfo,
-                "Horizontal component of surface velocity (m/s)",
-                "SURFHVEL");
-            AddSufixInternal("SPEEDORBITHORIZONTAL", SpeedOrbitHorizontal, VesselInfo,
-                "Horizontal component of orbital velocity (m/s)",
-                "ORBHVEL");
+            AddSuffix(new[] { "SPEEDORBITAL", "ORBVEL" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(SpeedOrbital(getInfo())),
+                    "Orbital speed relative to the reference body (m/s)"));
+
+            AddSuffix(new[] { "SPEEDSURFACE", "SURFVEL" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(SpeedSurface(getInfo())),
+                    "Surface speed relative to the rotating body (m/s)"));
+
+            AddSuffix(new[] { "SPEEDVERTICAL", "VERTVEL" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(SpeedVertical(getInfo())),
+                    "Vertical component of surface velocity (m/s)"));
+
+            AddSuffix(new[] { "SPEEDSURFACEHORIZONTAL", "SURFHVEL" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(SpeedSurfaceHorizontal(getInfo())),
+                    "Horizontal component of surface velocity (m/s)"));
+
+            AddSuffix(new[] { "SPEEDORBITHORIZONTAL", "ORBHVEL" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(SpeedOrbitHorizontal(getInfo())),
+                    "Horizontal component of orbital velocity (m/s)"));
 
             // Attitude
-            AddSufixInternal("VESSELHEADING", VesselHeading, VesselInfo, "Vessel heading in degrees (0 = North)",
-                "HDG");
-            AddSufixInternal("VESSELPITCH", VesselPitch, VesselInfo, "Vessel pitch in degrees (0 = horizon, + up)",
-                "PITCH");
-            AddSufixInternal("VESSELROLL", VesselRoll, VesselInfo, "Vessel roll in degrees", "ROLL");
+            AddSuffix(new[] { "VESSELHEADING", "HDG" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(VesselHeading(getInfo())),
+                    "Vessel heading in degrees (0 = North)"));
+
+            AddSuffix(new[] { "VESSELPITCH", "PITCH" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(VesselPitch(getInfo())),
+                    "Vessel pitch in degrees (0 = horizon, + up)"));
+
+            AddSuffix(new[] { "VESSELROLL", "ROLL" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(VesselRoll(getInfo())),
+                    "Vessel roll in degrees"));
 
             // Altitudes
-            AddSufixInternal("ALTITUDEASL", AltitudeAsl, VesselInfo, "Altitude above sea level (m)", "ALTASL");
-            AddSufixInternal("ALTITUDETRUE", AltitudeTrue, VesselInfo, "True altitude above terrain (m)", "ALTTRUE");
-            AddSufixInternal("SURFACEALTITUDEASL", SurfaceAltitudeAsl, VesselInfo,
-                "Surface altitude above sea level under the vessel (m)",
-                "SURFALT");
+            AddSuffix(new[] { "ALTITUDEASL", "ALTASL" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(AltitudeAsl(getInfo())),
+                    "Altitude above sea level (m)"));
+
+            AddSuffix(new[] { "ALTITUDETRUE", "ALTTRUE" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(AltitudeTrue(getInfo())),
+                    "True altitude above terrain (m)"));
+
+            AddSuffix(new[] { "SURFACEALTITUDEASL", "SURFALT" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(SurfaceAltitudeAsl(getInfo())),
+                    "Surface altitude above sea level under the vessel (m)"));
 
             // Orbit
-            AddSufixInternal("ORBITAPA", OrbitApA, VesselInfo, "Apoapsis altitude above sea level (m)", "APA");
-            AddSufixInternal("ORBITPEA", OrbitPeA, VesselInfo, "Periapsis altitude above sea level (m)", "PEA");
-            AddSufixInternal("ORBITPERIOD", OrbitPeriod, VesselInfo, "Orbital period (s)", "ORBITPER");
-            AddSufixInternal("ORBITTIMETOAP", OrbitTimeToAp, VesselInfo, "Time to apoapsis (s)", "TTOAP");
-            AddSufixInternal("ORBITTIMETOPE", OrbitTimeToPe, VesselInfo, "Time to periapsis (s)", "TTOPE");
-            AddSufixInternal("ORBITLAN", OrbitLan, VesselInfo, "Longitude of ascending node (deg)", "LAN");
-            AddSufixInternal("ORBITARGUMENTOFPERIAPSIS", OrbitArgumentOfPeriapsis, VesselInfo,
-                "Argument of periapsis (deg)",
-                "ARGPE");
-            AddSufixInternal("ORBITINCLINATION", OrbitInclination, VesselInfo, "Orbital inclination (deg)", "INCL");
-            AddSufixInternal("ORBITECCENTRICITY", OrbitEccentricity, VesselInfo, "Orbital eccentricity", "ECC");
-            AddSufixInternal("ORBITSEMIAXIS", OrbitSemiMajorAxis, VesselInfo, "Orbital semi-major axis (m)", "SMA");
+            AddSuffix(new[] { "ORBITAPA", "APA" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(OrbitApA(getInfo())),
+                    "Apoapsis altitude above sea level (m)"));
+
+            AddSuffix(new[] { "ORBITPEA", "PEA" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(OrbitPeA(getInfo())),
+                    "Periapsis altitude above sea level (m)"));
+
+            AddSuffix(new[] { "ORBITPERIOD", "ORBITPER" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(OrbitPeriod(getInfo())),
+                    "Orbital period (s)"));
+
+            AddSuffix(new[] { "ORBITTIMETOAP", "TTOAP" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(OrbitTimeToAp(getInfo())),
+                    "Time to apoapsis (s)"));
+
+            AddSuffix(new[] { "ORBITTIMETOPE", "TTOPE" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(OrbitTimeToPe(getInfo())),
+                    "Time to periapsis (s)"));
+
+            AddSuffix(new[] { "ORBITLAN", "LAN" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(OrbitLan(getInfo())),
+                    "Longitude of ascending node (deg)"));
+
+            AddSuffix(new[] { "ORBITARGUMENTOFPERIAPSIS", "ARGPE" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(OrbitArgumentOfPeriapsis(getInfo())),
+                    "Argument of periapsis (deg)"));
+
+            AddSuffix(new[] { "ORBITINCLINATION", "INCL" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(OrbitInclination(getInfo())),
+                    "Orbital inclination (deg)"));
+
+            AddSuffix(new[] { "ORBITECCENTRICITY", "ECC" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(OrbitEccentricity(getInfo())),
+                    "Orbital eccentricity"));
+
+            AddSuffix(new[] { "ORBITSEMIAXIS", "SMA" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(OrbitSemiMajorAxis(getInfo())),
+                    "Orbital semi-major axis (m)"));
 
             // Surface position
-            AddSufixInternal("CELESTIALLONGITUDE", CelestialLongitude, VesselInfo,
-                "Sub-vessel longitude on the celestial body (deg)",
-                "CESTLON");
-            AddSufixInternal("LATITUDE", Latitude, VesselInfo, "Vessel latitude (deg)", "LAT");
-            AddSufixInternal("LONGITUDE", Longitude, VesselInfo, "Vessel longitude (deg)", "LON");
+            AddSuffix(new[] { "CELESTIALLONGITUDE", "CESTLON" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(CelestialLongitude(getInfo())),
+                    "Sub-vessel longitude on the celestial body (deg)"));
+
+            AddSuffix(new[] { "LATITUDE", "LAT" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(Latitude(getInfo())),
+                    "Vessel latitude (deg)"));
+
+            AddSuffix(new[] { "LONGITUDE", "LON" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(Longitude(getInfo())),
+                    "Vessel longitude (deg)"));
 
             // Aero angles
-            AddSufixInternal("AOA", Aoa, VesselInfo, "Angle of attack relative to airflow (deg)");
-            AddSufixInternal("AOS", Aos, VesselInfo, "Angle of sideslip relative to airflow (deg)");
-            AddSufixInternal("DISPLACEMENTANGLE", DisplacementAngle, VesselInfo,
-                "Angle between velocity vector and reference orientation (deg)", "DISPANG");
+            AddSuffix(new[] { "AOA" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(Aoa(getInfo())),
+                    "Angle of attack relative to airflow (deg)"));
+
+            AddSuffix(new[] { "AOS" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(Aos(getInfo())),
+                    "Angle of sideslip relative to airflow (deg)"));
+
+            AddSuffix(new[] { "DISPLACEMENTANGLE", "DISPANG" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(DisplacementAngle(getInfo())),
+                    "Angle between velocity vector and reference orientation (deg)"));
 
             // Aero / speed / drag
-            AddSufixInternal("MACH", Mach, VesselInfo, "Mach number (speed relative to speed of sound)", "MACH");
-            AddSufixInternal("SPEEDOFSOUND", SpeedOfSound, VesselInfo, "Local speed of sound (m/s)", "SOS");
-            AddSufixInternal("DRAGCOEF", DragCoef, VesselInfo, "Effective drag coefficient", "CD");
+            AddSuffix(new[] { "MACH" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(Mach(getInfo())),
+                    "Mach number (speed relative to speed of sound)"));
+
+            AddSuffix(new[] { "SPEEDOFSOUND", "SOS" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(SpeedOfSound(getInfo())),
+                    "Local speed of sound (m/s)"));
+
+            AddSuffix(new[] { "DRAGCOEF", "CD" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(DragCoef(getInfo())),
+                    "Effective drag coefficient"));
 
             // Atmosphere / pressure
-            AddSufixInternal("ATMOSPHERICDENSITYGRAMS", AtmosphericDensityGrams, VesselInfo,
-                "Atmospheric density (g/m^3)", "RHO");
-            AddSufixInternal("MAXDYNAMICPRESSURE", MaxDynamicPressure, VesselInfo,
-                "Maximum dynamic pressure experienced this flight (Pa)",
-                "QMAX");
-            AddSufixInternal("DYNAMICPRESSURE", DynamicPressure, VesselInfo, "Current dynamic pressure (Pa)", "Q");
+            AddSuffix(new[] { "ATMOSPHERICDENSITYGRAMS", "RHO" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(AtmosphericDensityGrams(getInfo())),
+                    "Atmospheric density (g/m^3)"));
+
+            AddSuffix(new[] { "MAXDYNAMICPRESSURE", "QMAX" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(MaxDynamicPressure(getInfo())),
+                    "Maximum dynamic pressure experienced this flight (Pa)"));
+
+            AddSuffix(new[] { "DYNAMICPRESSURE", "Q" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(DynamicPressure(getInfo())),
+                    "Current dynamic pressure (Pa)"));
 
             // Intake air
-            AddSufixInternal("INTAKEAIR", IntakeAir, VesselInfo, "Instantaneous intake air resource amount", "INTAKE");
-            AddSufixInternal("INTAKEAIRALLINTAKES", IntakeAirAllIntakes, VesselInfo,
-                "Total intake air supply from all intakes",
-                "INTAKEALL");
-            AddSufixInternal("INTAKEAIRNEEDED", IntakeAirNeeded, VesselInfo,
-                "Intake air needed by engines at current throttle",
-                "INTAKENEED");
-            AddSufixInternal("INTAKEAIRATMAX", IntakeAirAtMax, VesselInfo, "Intake air supply at maximum speed/flow",
-                "INTAKEMAX");
+            AddSuffix(new[] { "INTAKEAIR", "INTAKE" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(IntakeAir(getInfo())),
+                    "Instantaneous intake air resource amount"));
+
+            AddSuffix(new[] { "INTAKEAIRALLINTAKES", "INTAKEALL" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(IntakeAirAllIntakes(getInfo())),
+                    "Total intake air supply from all intakes"));
+
+            AddSuffix(new[] { "INTAKEAIRNEEDED", "INTAKENEED" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(IntakeAirNeeded(getInfo())),
+                    "Intake air needed by engines at current throttle"));
+
+            AddSuffix(new[] { "INTAKEAIRATMAX", "INTAKEMAX" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(IntakeAirAtMax(getInfo())),
+                    "Intake air supply at maximum speed/flow"));
 
             // Misc orbital / aerothermal
-            AddSufixInternal("ANGLETOPROGRADE", AngleToPrograde, VesselInfo,
-                "Angle between vessel forward and velocity prograde vector (deg)", "ANGPRO");
-            AddSufixInternal("FREEMOLECULARAEROTHERMALFLUX", FreeMolecularAerothermalFlux, VesselInfo,
-                "Estimated free molecular aerothermal flux (W/m^2)", "FMFLUX");
+            AddSuffix(new[] { "ANGLETOPROGRADE", "ANGPRO" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(AngleToPrograde(getInfo())),
+                    "Angle between vessel forward and velocity prograde vector (deg)"));
+
+            AddSuffix(new[] { "FREEMOLECULARAEROTHERMALFLUX", "FMFLUX" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(FreeMolecularAerothermalFlux(getInfo())),
+                    "Estimated free molecular aerothermal flux (W/m^2)"));
 
             // Net forces
-            AddSufixInternal("PUREDRAG", PureDrag, VesselInfo, "Net drag force magnitude (kN)", "DRAG");
-            AddSufixInternal("PURELIFT", PureLift, VesselInfo, "Net lift force magnitude (kN)", "LIFT");
+            AddSuffix(new[] { "PUREDRAG", "DRAG" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(PureDrag(getInfo())),
+                    "Net drag force magnitude (kN)"));
+
+            AddSuffix(new[] { "PURELIFT", "LIFT" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(PureLift(getInfo())),
+                    "Net lift force magnitude (kN)"));
         }
 
         public override string context() => nameof(VesselStateWrapper);

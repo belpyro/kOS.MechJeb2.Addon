@@ -4,6 +4,8 @@ using kOS.MechJeb2.Addon.Attributes;
 using kOS.MechJeb2.Addon.Core;
 using kOS.MechJeb2.Addon.Utils;
 using kOS.Safe.Utilities;
+using kOS.Safe.Encapsulation;
+using kOS.Safe.Encapsulation.Suffixes;
 
 namespace kOS.MechJeb2.Addon.Wrapeers
 {
@@ -150,109 +152,496 @@ namespace kOS.MechJeb2.Addon.Wrapeers
 
         protected override void InitializeSuffixes()
         {
+            var getModule = new Func<object>(() => Module);
+
             // ===== Maneuver / Node =====
-            AddSufixInternal("NEXTMANEUVERNODEBURNTIME", NextManeuverNodeBurnTime, Module,
-                "Burn time for next maneuver node", "BURN");
-            AddSufixInternal("TIMETOMANEUVERNODE", TimeToManeuverNode, Module, "Time to next maneuver node", "NODEETA");
-            AddSufixInternal("NEXTMANEUVERNODEDELTAV", NextManeuverNodeDeltaV, Module, "Node delta-V", "NODEDV");
+            AddSuffix(new[] { "NEXTMANEUVERNODEBURNTIME", "BURN" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(NextManeuverNodeBurnTime(getModule())),
+                    "Burn time for next maneuver node"));
 
-            // ===== TWR / thrust =====
-            AddSufixInternal("SURFACETWR", (Delegate)SurfaceTWR, Module, "Surface TWR", "STWR");
-            AddSufixInternal("LOCALTWR", (Delegate)LocalTWR, Module, "Local TWR", "LTWR");
-            AddSufixInternal("THROTTLETWR", (Delegate)ThrottleTWR, Module, "TWR at current throttle", "TTWR");
-            AddSufixInternal("CURRENTACC", (Delegate)CurrentAcceleration, Module, "Current acceleration", "ACC");
-            AddSufixInternal("CURRENTTHRUST", (Delegate)CurrentThrust, Module, "Current thrust (kN)", "THRUST");
-            AddSufixInternal("MAXTHRUST", (Delegate)MaxThrust, Module, "Max possible thrust", "MAXTH");
-            AddSufixInternal("MINTHRUST", (Delegate)MinThrust, Module, "Minimum engine thrust", "MINTH");
-            AddSufixInternal("MAXACC", (Delegate)MaxAcceleration, Module, "Max acceleration", "MAXACC");
-            AddSufixInternal("MINACC", (Delegate)MinAcceleration, Module, "Minimum acceleration", "MINACC");
-            AddSufixInternal("ACCELERATION", (Delegate)Acceleration, Module, "Net acceleration", "A");
+            AddSuffix(new[] { "TIMETOMANEUVERNODE", "NODEETA" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TimeToManeuverNode(getModule())),
+                    "Time to next maneuver node"));
 
-            // ===== Atmosphere =====
-            AddSufixInternal("ATMPRESSUREKPA", (Delegate)AtmosphericPressurekPA, Module, "Atmospheric pressure (kPa)",
-                "P_KPA");
-            AddSufixInternal("ATMPRESSURE", (Delegate)AtmosphericPressure, Module, "Atmospheric pressure (atm?)", "P");
-            AddSufixInternal("ATMDESITYDRAG", (Delegate)AtmosphericDrag, Module, "Drag force estimation", "DRAG");
-            AddSufixInternal("DRAGCOEF", (Delegate)DragCoefficient, Module, "Aerodynamic drag coefficient", "CD");
+            AddSuffix(new[] { "NEXTMANEUVERNODEDELTAV", "NODEDV" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(NextManeuverNodeDeltaV(getModule())),
+                    "Node delta-V"));
 
-            // ===== Coordinates =====
-            AddSufixInternal("COORDINATESTRING", GetCoordinateString, Module, "Formatted latitude/longitude", "COORD");
+            // ===== TWR / thrust / acceleration =====
+            AddSuffix(new[] { "SURFACETWR", "STWR" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(SurfaceTWR(getModule())),
+                    "Surface TWR"));
 
-            // ===== Orbit basics =====
-            AddSufixInternal("MEANANOMALY", (Delegate)MeanAnomaly, Module, "Mean anomaly", "MA");
-            AddSufixInternal("CURRENTORBITSUMMARY", CurrentOrbitSummary, Module, "Orbit summary", "ORBSUM");
-            AddSufixInternal("TARGETORBITSUMMARY", TargetOrbitSummary, Module, "Target orbit summary", "TORBSUM");
-            AddSufixInternal("CURRENTORBITSUMMARYINC", CurrentOrbitSummaryWithInclination, Module,
-                "Orbit summary incl.", "ORBSUMINC");
-            AddSufixInternal("TARGETORBITSUMMARYINC", TargetOrbitSummaryWithInclination, Module,
-                "Target orbit summary incl.",
-                "TORBSUMINC");
-            AddSufixInternal("ORBITALENERGY", (Delegate)OrbitalEnergy, Module, "Specific orbital energy", "ENERGY");
-            AddSufixInternal("POTENTIALENERGY", (Delegate)PotentialEnergy, Module, "Potential orbital energy", "POT");
-            AddSufixInternal("KINETICENERGY", (Delegate)KineticEnergy, Module, "Kinetic energy", "KIN");
-            AddSufixInternal("TIMETOIMPACT", TimeToImpact, Module, "Time until impact", "IMPACT");
-            AddSufixInternal("SUICIDEBURNCOUNTDOWN", SuicideBurnCountdown, Module, "Time until suicide burn", "SBC");
-            AddSufixInternal("TIMETOSOITRANSITION", TimeToSOITransition, Module, "Time to SOI transition", "SOIETA");
-            AddSufixInternal("SURFACEGRAVITY", (Delegate)SurfaceGravity, Module, "Surface gravity", "g");
-            AddSufixInternal("ESCAPEVELOCITY", (Delegate)EscapeVelocity, Module, "Escape velocity", "VESC");
-            AddSufixInternal("CIRCULARORBITSPEED", (Delegate)CircularOrbitSpeed, Module, "Circular orbit velocity",
-                "VCIRC");
+            AddSuffix(new[] { "LOCALTWR", "LTWR" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(LocalTWR(getModule())),
+                    "Local TWR"));
+
+            AddSuffix(new[] { "THROTTLETWR", "TTWR" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(ThrottleTWR(getModule())),
+                    "TWR at current throttle"));
+
+            AddSuffix(new[] { "CURRENTACC", "ACC" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(CurrentAcceleration(getModule())),
+                    "Current acceleration"));
+
+            AddSuffix(new[] { "CURRENTTHRUST", "THRUST" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(CurrentThrust(getModule())),
+                    "Current thrust (kN)"));
+
+            AddSuffix(new[] { "MAXTHRUST", "MAXTH" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(MaxThrust(getModule())),
+                    "Max possible thrust"));
+
+            AddSuffix(new[] { "MINTHRUST", "MINTH" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(MinThrust(getModule())),
+                    "Minimum engine thrust"));
+
+            AddSuffix(new[] { "MAXACC", "MAXACC" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(MaxAcceleration(getModule())),
+                    "Max acceleration"));
+
+            AddSuffix(new[] { "MINACC", "MINACC" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(MinAcceleration(getModule())),
+                    "Minimum acceleration"));
+
+            AddSuffix(new[] { "ACCELERATION", "A" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(Acceleration(getModule())),
+                    "Net acceleration"));
+
+            // ===== Atmosphere / drag =====
+            AddSuffix(new[] { "ATMPRESSUREKPA", "P_KPA" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(AtmosphericPressurekPA(getModule())),
+                    "Atmospheric pressure (kPa)"));
+
+            AddSuffix(new[] { "ATMPRESSURE", "P" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(AtmosphericPressure(getModule())),
+                    "Atmospheric pressure"));
+
+            AddSuffix(new[] { "ATMDESITYDRAG", "DRAG" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(AtmosphericDrag(getModule())),
+                    "Drag force estimation"));
+
+            AddSuffix(new[] { "DRAGCOEF", "CD" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(DragCoefficient(getModule())),
+                    "Aerodynamic drag coefficient"));
+
+            // ===== Coordinates / position =====
+            AddSuffix(new[] { "COORDINATESTRING", "COORD" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(GetCoordinateString(getModule())),
+                    "Formatted latitude/longitude"));
+
+            // ===== Orbit basic =====
+            AddSuffix(new[] { "MEANANOMALY", "MA" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(MeanAnomaly(getModule())),
+                    "Mean anomaly"));
+
+            AddSuffix(new[] { "CURRENTORBITSUMMARY", "ORBSUM" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(CurrentOrbitSummary(getModule())),
+                    "Orbit summary"));
+
+            AddSuffix(new[] { "TARGETORBITSUMMARY", "TORBSUM" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetOrbitSummary(getModule())),
+                    "Target orbit summary"));
+
+            AddSuffix(new[] { "CURRENTORBITSUMMARYINC", "ORBSUMINC" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(CurrentOrbitSummaryWithInclination(getModule())),
+                    "Orbit summary with inclination"));
+
+            AddSuffix(new[] { "TARGETORBITSUMMARYINC", "TORBSUMINC" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetOrbitSummaryWithInclination(getModule())),
+                    "Target orbit summary with inclination"));
+
+            AddSuffix(new[] { "ORBITALENERGY", "ENERGY" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(OrbitalEnergy(getModule())),
+                    "Specific orbital energy"));
+
+            AddSuffix(new[] { "POTENTIALENERGY", "POT" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(PotentialEnergy(getModule())),
+                    "Potential orbital energy"));
+
+            AddSuffix(new[] { "KINETICENERGY", "KIN" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(KineticEnergy(getModule())),
+                    "Kinetic energy"));
+
+            AddSuffix(new[] { "TIMETOIMPACT", "IMPACT" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TimeToImpact(getModule())),
+                    "Time until impact"));
+
+            AddSuffix(new[] { "SUICIDEBURNCOUNTDOWN", "SBC" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(SuicideBurnCountdown(getModule())),
+                    "Time until suicide burn"));
+
+            AddSuffix(new[] { "TIMETOSOITRANSITION", "SOIETA" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TimeToSOITransition(getModule())),
+                    "Time to SOI transition"));
+
+            AddSuffix(new[] { "SURFACEGRAVITY", "g" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(SurfaceGravity(getModule())),
+                    "Surface gravity"));
+
+            AddSuffix(new[] { "ESCAPEVELOCITY", "VESC" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(EscapeVelocity(getModule())),
+                    "Escape velocity"));
+
+            AddSuffix(new[] { "CIRCULARORBITSPEED", "VCIRC" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(CircularOrbitSpeed(getModule())),
+                    "Circular orbit velocity"));
 
             // ===== RCS =====
-            AddSufixInternal("RCSTHRUST", (Delegate)RCSThrust, Module, "RCS thrust", "RCSF");
-            AddSufixInternal("RCSTRANSLATIONEFF", RCSTranslationEfficiency, Module, "RCS translation eff", "RCSEFF");
-            AddSufixInternal("RCSDELTAVVAC", (Delegate)RCSDeltaVVacuum, Module, "RCS ΔV vacuum", "RCSDV");
+            AddSuffix(new[] { "RCSTHRUST", "RCSF" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(RCSThrust(getModule())),
+                    "RCS thrust"));
 
-            // ===== Angular =====
-            AddSufixInternal("ANGULARVELOCITY", AngularVelocity, Module, "Angular velocity", "ANGVEL");
+            AddSuffix(new[] { "RCSTRANSLATIONEFF", "RCSEFF" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(RCSTranslationEfficiency(getModule())),
+                    "RCS translation efficiency"));
+
+            AddSuffix(new[] { "RCSDELTAVVAC", "RCSDV" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(RCSDeltaVVacuum(getModule())),
+                    "RCS ΔV in vacuum"));
+
+            // ===== Angular velocity =====
+            AddSuffix(new[] { "ANGULARVELOCITY", "ANGVEL" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(AngularVelocity(getModule())),
+                    "Angular velocity"));
 
             // ===== Vessel basic =====
-            AddSufixInternal("VESSELNAME", VesselName, Module, "Vessel name", "NAME");
-            AddSufixInternal("VESSELTYPE", VesselType, Module, "Vessel type", "TYPE");
-            AddSufixInternal("VESSELMASS", (Delegate)VesselMass, Module, "Total vessel mass", "MASS");
-            AddSufixInternal("MAXVESSELMASS", MaximumVesselMass, Module, "Maximum vessel mass", "MASSMAX");
-            AddSufixInternal("DRYMASS", (Delegate)DryMass, Module, "Dry mass", "DRYM");
-            AddSufixInternal("LFO_MASS", (Delegate)LiquidFuelAndOxidizerMass, Module, "LFO mass", "LFO");
-            AddSufixInternal("MONOPROP_MASS", (Delegate)MonoPropellantMass, Module, "MonoPropellant mass", "MP");
-            AddSufixInternal("ELECTRICCHARGE", (Delegate)TotalElectricCharge, Module, "Electric charge", "EC");
-            AddSufixInternal("PARTCOUNT", PartCount, Module, "Part count", "PC");
-            AddSufixInternal("MAXPARTCOUNT", MaxPartCount, Module, "Max part count", "PCMAX");
-            AddSufixInternal("PARTCOUNTANDMAX", PartCountAndMaxPartCount, Module, "Part count (with max)", "PCM");
-            AddSufixInternal("STRUTCOUNT", StrutCount, Module, "Strut count", "STRUTS");
-            AddSufixInternal("FUELLINESCOUNT", FuelLinesCount, Module, "Fuel lines count", "LINES");
-            AddSufixInternal("VESSELCOST", (Delegate)VesselCost, Module, "Vessel cost", "COST");
-            AddSufixInternal("CREWCOUNT", CrewCount, Module, "Crew on board", "CREW");
-            AddSufixInternal("CREWCAPACITY", CrewCapacity, Module, "Crew capacity", "CAP");
+            AddSuffix(new[] { "VESSELNAME", "NAME" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(VesselName(getModule())),
+                    "Vessel name"));
 
-            // ===== Target relative motion =====
-            AddSufixInternal("TARGETDISTANCE", TargetDistance, Module, "Distance to target", "TDIST");
-            AddSufixInternal("HEADINGTOTARGET", HeadingToTarget, Module, "Heading to target", "THDG");
-            AddSufixInternal("TARGETRELV", TargetRelativeVelocity, Module, "Relative velocity", "TRELV");
-            AddSufixInternal("TARGETTTCLOSEAPP", TargetTimeToClosestApproach, Module, "ETA to closest approach", "TCA");
-            AddSufixInternal("TARGETCLOSEAPPDIST", TargetClosestApproachDistance, Module, "Closest approach dist",
-                "CADIST");
-            AddSufixInternal("TARGETCLOSEAPPRELV", TargetClosestApproachRelativeVelocity, Module, "Closest rel vel",
-                "CAREL");
+            AddSuffix(new[] { "VESSELTYPE", "TYPE" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(VesselType(getModule())),
+                    "Vessel type"));
+
+            AddSuffix(new[] { "VESSELMASS", "MASS" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(VesselMass(getModule())),
+                    "Total vessel mass"));
+
+            AddSuffix(new[] { "MAXVESSELMASS", "MASSMAX" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(MaximumVesselMass(getModule())),
+                    "Maximum vessel mass"));
+
+            AddSuffix(new[] { "DRYMASS", "DRYM" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(DryMass(getModule())),
+                    "Dry mass"));
+
+            AddSuffix(new[] { "LFO_MASS", "LFO" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(LiquidFuelAndOxidizerMass(getModule())),
+                    "LFO mass"));
+
+            AddSuffix(new[] { "MONOPROP_MASS", "MP" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(MonoPropellantMass(getModule())),
+                    "MonoPropellant mass"));
+
+            AddSuffix(new[] { "ELECTRICCHARGE", "EC" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(TotalElectricCharge(getModule())),
+                    "Electric charge"));
+
+            AddSuffix(new[] { "PARTCOUNT", "PC" },
+                new NoArgsSuffix<ScalarIntValue>(
+                    () => new ScalarIntValue(PartCount(getModule())),
+                    "Part count"));
+
+            AddSuffix(new[] { "MAXPARTCOUNT", "PCMAX" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(MaxPartCount(getModule())),
+                    "Max part count"));
+
+            AddSuffix(new[] { "PARTCOUNTANDMAX", "PCM" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(PartCountAndMaxPartCount(getModule())),
+                    "Part count (with max)"));
+
+            AddSuffix(new[] { "STRUTCOUNT", "STRUTS" },
+                new NoArgsSuffix<ScalarIntValue>(
+                    () => new ScalarIntValue(StrutCount(getModule())),
+                    "Strut count"));
+
+            AddSuffix(new[] { "FUELLINESCOUNT", "LINES" },
+                new NoArgsSuffix<ScalarIntValue>(
+                    () => new ScalarIntValue(FuelLinesCount(getModule())),
+                    "Fuel lines count"));
+
+            AddSuffix(new[] { "VESSELCOST", "COST" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(VesselCost(getModule())),
+                    "Vessel cost"));
+
+            AddSuffix(new[] { "CREWCOUNT", "CREW" },
+                new NoArgsSuffix<ScalarIntValue>(
+                    () => new ScalarIntValue(CrewCount(getModule())),
+                    "Crew on board"));
+
+            AddSuffix(new[] { "CREWCAPACITY", "CAP" },
+                new NoArgsSuffix<ScalarIntValue>(
+                    () => new ScalarIntValue(CrewCapacity(getModule())),
+                    "Crew capacity"));
+
+            // ===== Target distance / relative motion =====
+            AddSuffix(new[] { "TARGETDISTANCE", "TDIST" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetDistance(getModule())),
+                    "Distance to target"));
+
+            AddSuffix(new[] { "HEADINGTOTARGET", "THDG" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(HeadingToTarget(getModule())),
+                    "Heading to target"));
+
+            AddSuffix(new[] { "TARGETRELV", "TRELV" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetRelativeVelocity(getModule())),
+                    "Relative velocity to target"));
+
+            AddSuffix(new[] { "TARGETTTCLOSEAPP", "TCA" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetTimeToClosestApproach(getModule())),
+                    "ETA to closest approach"));
+
+            AddSuffix(new[] { "TARGETCLOSEAPPDIST", "CADIST" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetClosestApproachDistance(getModule())),
+                    "Closest approach distance"));
+
+            AddSuffix(new[] { "TARGETCLOSEAPPRELV", "CAREL" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetClosestApproachRelativeVelocity(getModule())),
+                    "Closest approach relative velocity"));
+
+            // ===== Target SoI / capture =====
+            AddSuffix(new[] { "PERIAPSISINTARGETSOI", "TPERI" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(PeriapsisInTargetSOI(getModule())),
+                    "Periapsis in target SOI"));
+
+            AddSuffix(new[] { "TARGETCAPTUREDV", "TCAPDV" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetCaptureDV(getModule())),
+                    "Target capture ΔV"));
+
+            // ===== Target orbit numbers =====
+            AddSuffix(new[] { "TARGETAPOAPSIS", "TAPA" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetApoapsis(getModule())),
+                    "Target apoapsis"));
+
+            AddSuffix(new[] { "TARGETPERIAPSIS", "TPEA" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetPeriapsis(getModule())),
+                    "Target periapsis"));
+
+            AddSuffix(new[] { "TARGETINCLINATION", "TINCL" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetInclination(getModule())),
+                    "Target inclination"));
+
+            AddSuffix(new[] { "TARGETORBITPERIOD", "TORBITPER" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetOrbitPeriod(getModule())),
+                    "Target orbit period"));
+
+            AddSuffix(new[] { "TARGETORBITSPEED", "TORBVEL" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetOrbitSpeed(getModule())),
+                    "Target orbital speed"));
+
+            AddSuffix(new[] { "TARGETORBITTIMETOAP", "TTTOAP" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetOrbitTimeToAp(getModule())),
+                    "Target time to apoapsis"));
+
+            AddSuffix(new[] { "TARGETORBITTIMETOPE", "TTTOPE" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetOrbitTimeToPe(getModule())),
+                    "Target time to periapsis"));
+
+            AddSuffix(new[] { "TARGETLAN", "TLAN" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetLAN(getModule())),
+                    "Target longitude of ascending node"));
+
+            AddSuffix(new[] { "TARGETLDN", "TLDN" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetLDN(getModule())),
+                    "Target longitude of descending node"));
+
+            AddSuffix(new[] { "TARGETTIMETOASCENDINGNODE", "TTAN" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetTimeToAscendingNode(getModule())),
+                    "Target time to ascending node"));
+
+            AddSuffix(new[] { "TARGETTIMETODESCENDINGNODE", "TTDN" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetTimeToDescendingNode(getModule())),
+                    "Target time to descending node"));
+
+            AddSuffix(new[] { "TARGETAOP", "TAOP" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetAoP(getModule())),
+                    "Target argument of periapsis"));
+
+            AddSuffix(new[] { "TARGETECCENTRICITY", "TECC" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetEccentricity(getModule())),
+                    "Target eccentricity"));
+
+            AddSuffix(new[] { "TARGETSMA", "TSMA" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetSMA(getModule())),
+                    "Target semi-major axis"));
+
+            AddSuffix(new[] { "TARGETMEANANOMALY", "TMA" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetMeanAnomaly(getModule())),
+                    "Target mean anomaly"));
+
+            AddSuffix(new[] { "TARGETTRUELONGITUDE", "TTLON" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetTrueLongitude(getModule())),
+                    "Target true longitude"));
+
+            // ===== Target / relative geometry =====
+            AddSuffix(new[] { "SYNODICPERIOD", "SYNOD" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(SynodicPeriod(getModule())),
+                    "Synodic period"));
+
+            AddSuffix(new[] { "PHASEANGLE", "PHASE" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(PhaseAngle(getModule())),
+                    "Phase angle"));
+
+            AddSuffix(new[] { "TARGETPLANETPHASEANGLE", "TPHASE" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TargetPlanetPhaseAngle(getModule())),
+                    "Target planet phase angle"));
+
+            AddSuffix(new[] { "RELATIVEINCLINATIONTOTARGET", "RINCL" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(RelativeInclinationToTarget(getModule())),
+                    "Relative inclination to target"));
+
+            AddSuffix(new[] { "TIMETOASCENDINGNODEWITHTARGET", "TTANWT" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TimeToAscendingNodeWithTarget(getModule())),
+                    "Time to ascending node with target"));
+
+            AddSuffix(new[] { "TIMETODESCENDINGNODEWITHTARGET", "TTDNWT" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TimeToDescendingNodeWithTarget(getModule())),
+                    "Time to descending node with target"));
+
+            AddSuffix(new[] { "TIMETOEQUATORIALASCENDINGNODE", "TTEAN" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TimeToEquatorialAscendingNode(getModule())),
+                    "Time to equatorial ascending node"));
+
+            AddSuffix(new[] { "TIMETOEQUATORIALDESCENDINGNODE", "TTEDN" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TimeToEquatorialDescendingNode(getModule())),
+                    "Time to equatorial descending node"));
 
             // ===== Biomes =====
-            AddSufixInternal("CURRENTRAWBIOME", CurrentRawBiome, Module, "Raw biome name", "RAWBIOME");
-            AddSufixInternal("CURRENTBIOME", CurrentBiome, Module, "Biome name", "BIOME");
+            AddSuffix(new[] { "CURRENTRAWBIOME", "RAWBIOME" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(CurrentRawBiome(getModule())),
+                    "Raw biome name"));
 
-            // ===== Stage data =====
-            AddSufixInternal("STAGEDELTAVVAC", (Delegate)StageDeltaVVacuum, Module, "Stage ΔV vacuum", "SDV");
-            AddSufixInternal("STAGEDELTAVATM", (Delegate)StageDeltaVAtmosphere, Module, "Stage ΔV atmosphere",
-                "SDVATM");
-            AddSufixInternal("STAGEDELTAVATMVAC", StageDeltaVAtmosphereAndVac, Module, "Formatted ΔV atm/vac",
-                "SDVSTR");
-            AddSufixInternal("STAGETIMEFULL", StageTimeLeftFullThrottle, Module, "Stage burn time full throttle",
-                "TBURNF");
-            AddSufixInternal("STAGETIMECURRENT", StageTimeLeftCurrentThrottle, Module,
-                "Stage burn time current throttle", "TBURNC");
-            AddSufixInternal("STAGETIMEHOVER", StageTimeLeftHover, Module, "Stage hover time", "THOVER");
-            AddSufixInternal("TOTALDVVAC", (Delegate)TotalDeltaVVaccum, Module, "Total ΔV vacuum", "TDV");
-            AddSufixInternal("TOTALDVATM", (Delegate)TotalDeltaVAtmosphere, Module, "Total ΔV atmosphere", "TDVATM");
-            AddSufixInternal("TOTALDVATMVAC", TotalDeltaVAtmosphereAndVac, Module, "Formatted total ΔV atm/vac",
-                "TDVSTR");
+            AddSuffix(new[] { "CURRENTBIOME", "BIOME" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(CurrentBiome(getModule())),
+                    "Biome name"));
+
+            // ===== Stage dV / time =====
+            AddSuffix(new[] { "STAGEDELTAVVAC", "SDV" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(StageDeltaVVacuum(getModule())),
+                    "Stage ΔV vacuum"));
+
+            AddSuffix(new[] { "STAGEDELTAVATM", "SDVATM" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(StageDeltaVAtmosphere(getModule())),
+                    "Stage ΔV atmosphere"));
+
+            AddSuffix(new[] { "STAGEDELTAVATMVAC", "SDVSTR" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(StageDeltaVAtmosphereAndVac(getModule())),
+                    "Formatted ΔV atm/vac"));
+
+            AddSuffix(new[] { "STAGETIMEFULL", "TBURNF" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(StageTimeLeftFullThrottle(getModule())),
+                    "Stage burn time full throttle"));
+
+            AddSuffix(new[] { "STAGETIMECURRENT", "TBURNC" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(StageTimeLeftCurrentThrottle(getModule())),
+                    "Stage burn time current throttle"));
+
+            AddSuffix(new[] { "STAGETIMEHOVER", "THOVER" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(StageTimeLeftHover(getModule())),
+                    "Stage hover time"));
+
+            AddSuffix(new[] { "TOTALDVVAC", "TDV" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(TotalDeltaVVaccum(getModule())),
+                    "Total ΔV vacuum"));
+
+            AddSuffix(new[] { "TOTALDVATM", "TDVATM" },
+                new NoArgsSuffix<ScalarDoubleValue>(
+                    () => new ScalarDoubleValue(TotalDeltaVAtmosphere(getModule())),
+                    "Total ΔV atmosphere"));
+
+            AddSuffix(new[] { "TOTALDVATMVAC", "TDVSTR" },
+                new NoArgsSuffix<StringValue>(
+                    () => new StringValue(TotalDeltaVAtmosphereAndVac(getModule())),
+                    "Formatted total ΔV atm/vac"));
         }
 
         public override string context() => nameof(MechJebInfoItemsWrapper);
