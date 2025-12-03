@@ -57,6 +57,11 @@ This addon provides a bridge between **kOS** and **MechJeb2**, allowing you to:
 
 ---
 
+### 🧪 kOS test scripts
+
+The repository includes a `Tests` folder with example kOS scripts that exercise the addon API. You can copy these scripts to your kOS archive or local volume and use them for local testing and verification of the wrappers and suffixes.
+
+
 ## 🕹 Using the Addon in kOS
 
 ### kOS addon access pattern
