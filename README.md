@@ -67,20 +67,23 @@ The addon is registered in kOS via the `[KOSAddon("MJ")]` attribute, so the corr
 set mj to addons:mj.
 ```
 
-From there you can access the MechJeb core wrapper and its sub-wrappers:
+From there you can access the MechJeb core status and the main wrappers directly on the addon:
 
 ```ks
-set mj   to addons:mj.
+set mj to addons:mj.
+
+// Core status wrapper
 set core to mj:core.
+print "MechJeb core running: " + core:running.
 
 // Vessel state wrapper
-set v    to core:vessel.
+set v    to mj:vessel.
 
 // Info items wrapper
-set info to core:info.
+set info to mj:info.
 
 // Ascent autopilot wrapper
-set asc  to core:ascent.
+set asc  to mj:ascent.
 ```
 
 ---
@@ -89,52 +92,63 @@ set asc  to core:ascent.
 
 ### Top-level addon suffixes (`ADDONS:MJ`)
 
-| Suffix      | Type               | Description                                                                 |
-|-------------|--------------------|-----------------------------------------------------------------------------|
-| `CORE`      | MechJebCoreWrapper | Entry point to all MechJeb-related wrappers                                |
-| `INIT`      | Bool / Function    | Manually (re)initializes MechJeb integration. Optional bool argument forces reinit. |
-| `AVAILABLE` | Boolean            | True if MechJeb is available for this vessel                               |
-| `VERSION`   | VersionInfo        | Actual plugin version                                                        |
+These suffixes are available directly on the addon and mirror the core wrapper structure for convenience:
+
+| Suffix                     | Type                    | Description                                           |
+|----------------------------|-------------------------|-------------------------------------------------------|
+| `CORE`                     | MechJebCoreWrapper      | Core status / master MechJeb binding (`RUNNING`)      |
+| `VESSEL`, `VESSELINFO`     | VesselStateWrapper      | Vessel flight state (altitude, speed, Q, AoA, etc.)   |
+| `INFO`                     | MechJebInfoItemsWrapper | MechJeb info items (ΔV, TWR, orbit, target, etc.)     |
+| `ASCENT`, `ASCENTGUIDANCE` | MechJebAscentWrapper    | Classic ascent autopilot settings and toggles         |
+| `VERSION`                  | VersionInfo             | Actual plugin/addon version                           |
 
 ```ks
 set mj to addons:mj.
 
-if not mj:available {
-    print "MechJeb is not installed for this vessel.".
-}
-
+// Core status
 set core to mj:core.
+print "MechJeb core running: " + core:running.
+
+// Wrappers
+set v    to mj:vessel.
+set info to mj:info.
+set asc  to mj:ascent.
+
+print "Surface speed: " + v:SPEEDSURFACE.
+print "Total DV (vac): " + info:TOTALDVVAC.
+print "Addon version: " + mj:version.
 ```
 
 ### Important limitations
 
-- The addon assumes **exactly one MechJeb core module in RUNNING state per vessel**.
-- If multiple MechJebCore modules are present and running on the same vessel, the addon will **refuse to initialize** and `ADDONS:MJ:AVAILABLE` will be `FALSE`.
-- If you use multiple MechJeb parts on a single craft, make sure that only one of them has an active core before using this addon.
+- The addon binds to the same **master MechJeb core** that MechJeb itself uses internally (via its `GetMasterMechJeb` logic).
+- If multiple MechJebCore modules are present on the same vessel, MechJeb decides which one is the master; this addon will always follow that choice.
+- If MechJeb is not installed, or there is no running MechJeb core for the current vessel, attempting to access `ADDONS:MJ:CORE` (or wrappers like `VESSEL`, `ASCENT`, `INFO`) may result in a kOS exception.
+- For best results, use a standard MechJeb setup with a single actively used MechJeb core per vessel.
 
 ---
 
 ### Core wrapper (`ADDONS:MJ:CORE`)
 
-| Suffix   | Type                   | Description                                     |
-|----------|------------------------|-------------------------------------------------|
-| `VESSEL` | VesselStateWrapper     | Vessel flight state (altitude, speed, Q, AoA…) |
-| `INFO`   | MechJebInfoItemsWrapper| MechJeb info values (ΔV, TWR, orbit, target…)  |
-| `ASCENT` | MechJebAscentWrapper   | Ascent autopilot control                        |
-| `RUNNING`| Boolean                | True if MechJeb core is initialized             |
+The core wrapper now only exposes core status, since all functional wrappers are available directly on the addon.
+
+| Suffix    | Type    | Description                                   |
+|-----------|---------|-----------------------------------------------|
+| `RUNNING` | Boolean | True if a master MechJeb core is bound/active |
 
 ```ks
 set core to addons:mj:core.
 
-print core:running.
-set v    to core:vessel.
-set info to core:info.
-set asc  to core:ascent.
+if core:running {
+    print "MechJeb core is running.".
+} else {
+    print "MechJeb core is not available.".
+}
 ```
 
 ---
 
-### Vessel state wrapper (`ADDONS:MJ:CORE:VESSEL`)
+### Vessel state wrapper (`ADDONS:MJ:VESSEL` / `ADDONS:MJ:VESSELINFO`)
 
 This wrapper exposes real-time vessel state (numbers mostly taken from MechJeb's internal `VesselState`).  
 All suffix names are case-insensitive in kOS; here they are shown in UPPERCASE as they are registered.
@@ -245,7 +259,7 @@ All suffix names are case-insensitive in kOS; here they are shown in UPPERCASE a
 #### Example
 
 ```ks
-set v to addons:mj:core:vessel.
+set v to addons:mj:vessel.
 
 print "Surface speed: " + v:SPEEDSURFACE.
 print "Altitude ASL:  " + v:ALTITUDEASL.
@@ -255,7 +269,7 @@ print "AoA:           " + v:AOA.
 ```
 ---
 
-### Info items wrapper (`ADDONS:MJ:CORE:INFO`)
+### Info items wrapper (`ADDONS:MJ:INFO`)
 
 This wrapper exposes MechJeb “Info Items” (methods marked with `ValueInfoItem`) as kOS suffixes.  
 All suffix names are case-insensitive in kOS; here they are shown in UPPERCASE as they are registered.
@@ -387,7 +401,7 @@ All suffix names are case-insensitive in kOS; here they are shown in UPPERCASE a
 #### Example
 
 ```ks
-set info to addons:mj:core:info.
+set info to addons:mj:info.
 
 print "Surface TWR:    " + info:SURFACETWR.
 print "Total DV (vac): " + info:TOTALDVVAC.
@@ -398,7 +412,7 @@ print "Biome:          " + info:CURRENTBIOME.
 
 ---
 
-### Ascent autopilot wrapper (`ADDONS:MJ:CORE:ASCENT`)
+### Ascent autopilot wrapper (`ADDONS:MJ:ASCENT`)
 
 This wrapper exposes MechJeb’s **classic ascent guidance only** to kOS.  
 All suffix names are case-insensitive in kOS; here they are shown in UPPERCASE as they are registered.
@@ -406,9 +420,8 @@ All suffix names are case-insensitive in kOS; here they are shown in UPPERCASE a
 #### Getting the wrapper
 
 ```ks
-set mj   to addons:mj.
-set core to mj:core.
-set asc  to core:ascent.
+set mj  to addons:mj.
+set asc to mj:ascent.
 ```
 
 ---
@@ -545,9 +558,8 @@ set asc  to core:ascent.
 #### Example: classic RP-1 style ascent
 
 ```ks
-set mj   to addons:mj.
-set core to mj:core.
-set asc  to core:ascent.
+set mj  to addons:mj.
+set asc to mj:ascent.
 
 // Basic target orbit
 set asc:desiredaltitude    to 250000.
