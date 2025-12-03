@@ -62,7 +62,7 @@ namespace kOS.MechJeb2.Addon.Utils
                         : GetMemberValue(coreInstance, coreMember);
 
                     if (memberInstance == null) continue;
-                    nested.Initialize(memberInstance);
+                    // nested.Initialize(memberInstance);
                 }
             }
         }

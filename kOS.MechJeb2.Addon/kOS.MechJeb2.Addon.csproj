@@ -53,13 +53,13 @@
         <Compile Include="Core\IBaseWrapper.cs"/>
         <Compile Include="Core\IInfoItemsWrapper.cs"/>
         <Compile Include="Core\IMechJebAscentWrapper.cs"/>
-        <Compile Include="Core\IMechJebCoreWrapper.cs"/>
         <Compile Include="Core\IVesselStateWrapper.cs"/>
         <Compile Include="kOS\PredicatedSetSuffix.cs"/>
         <Compile Include="MechJebController.cs"/>
         <Compile Include="Properties\AssemblyInfo.cs"/>
         <Compile Include="Utils\FluentReflectUtils.cs"/>
         <Compile Include="Utils\MechJebBinder.cs"/>
+        <Compile Include="Utils\MechJebExtensions.cs" />
         <Compile Include="Utils\ReflectionUtils.cs"/>
         <Compile Include="Utils\VesselUtils.cs"/>
         <Compile Include="Wrapeers\BaseWrapper.cs"/>

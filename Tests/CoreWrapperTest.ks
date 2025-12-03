@@ -76,26 +76,6 @@ PRINT "CORE basic tests done.".
 PRINT "-------------------------------".
 
 // -----------------------------------------------------------------------------
-// Test: CORE sub-wrappers access (VESSEL / ASCENT / INFO)
-// -----------------------------------------------------------------------------
-PRINT "TEST: CORE sub-wrappers access".
-
-// Vessel wrapper access
-SET vTime TO mjcore:VESSEL:TIME.
-ASSERT_TRUE("CORE:VESSEL TIME read OK", vTime >= 0).
-
-// Ascent wrapper access (minimal smoke test on a read-only-ish value)
-SET aAlt TO mjcore:ASCENT:DESIREDALTITUDE.
-ASSERT_TRUE("CORE:ASCENT DESIREDALTITUDE read OK", aAlt >= 0).
-
-// Info wrapper access
-SET iName TO mjcore:INFO:VESSELNAME.
-ASSERT_TRUE("CORE:INFO VESSELNAME not empty", iName <> "").
-
-PRINT "CORE sub-wrappers tests done.".
-PRINT "-------------------------------".
-
-// -----------------------------------------------------------------------------
 // FINAL SUMMARY
 // -----------------------------------------------------------------------------
 PRINT "".

@@ -29,7 +29,7 @@ DECLARE FUNCTION ASSERT_EQ {
 }.
 
 PRINT "Getting Ascent wrapper...".
-SET asc TO ADDONS:MJ:CORE:ASCENT.
+SET asc TO ADDONS:MJ:ASCENT.
 PRINT "OK.".
 PRINT "".
 

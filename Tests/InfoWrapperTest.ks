@@ -38,7 +38,7 @@ DECLARE FUNCTION ASSERT_TRUE {
 // Getting info wrapper
 // -----------------------------------------------------------------------------
 PRINT "Getting Info wrapper...".
-SET info TO ADDONS:MJ:CORE:INFO.
+SET info TO ADDONS:MJ:INFO.
 PRINT "OK.".
 PRINT "-------------------------------".
 

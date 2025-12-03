@@ -3,6 +3,7 @@ using kOS.MechJeb2.Addon.Core;
 using kOS.MechJeb2.Addon.Utils;
 using kOS.Safe.Encapsulation;
 using kOS.Safe.Encapsulation.Suffixes;
+using kOS.Safe.Exceptions;
 using kOS.Safe.Utilities;
 using KSPBuildTools;
 
@@ -11,22 +12,16 @@ namespace kOS.MechJeb2.Addon.Wrapeers
     [KOSNomenclature("BaseWrapper")]
     public abstract class BaseWrapper : Structure, IBaseWrapper, ILogContextProvider
     {
-        private Func<object, object> _getterMasterMechJeb;
-        protected object CoreInstance { get; private set; }
-        
-        protected object MasterMechJeb => _getterMasterMechJeb(CoreInstance);
-        
-        public bool Initialized { get; protected set; }
+        protected PartModule MasterMechJeb => FlightGlobals.fetch.activeVessel.GetMasterMJ();
 
-        public virtual void Initialize(object coreInstance, bool force = false)
+        public void Initialize()
         {
-            if (Initialized && !force) return;
-            CoreInstance = coreInstance;
-            _getterMasterMechJeb = Reflect.On(CoreInstance).Property("MasterMechJeb").AsGetter<object>();
             BindObject();
             RegisterInitializer(InitializeSuffixes);
             Initialized = true;
         }
+
+        public bool Initialized { get; protected set; }
 
         protected void AddSufixInternal(string name, Func<object, double> getter, object o, string description,
             params string[] aliases)
@@ -48,7 +43,8 @@ namespace kOS.MechJeb2.Addon.Wrapeers
             }
         }
 
-        protected void AddSufixInternal(string name, Delegate getter, object o, string description, params string[] aliases)
+        protected void AddSufixInternal(string name, Delegate getter, object o, string description,
+            params string[] aliases)
         {
             ISuffix suffix;
 
@@ -85,7 +81,7 @@ namespace kOS.MechJeb2.Addon.Wrapeers
 
         protected abstract void InitializeSuffixes();
         public abstract string context();
-        
+
         protected MemberBinder Member(object target, string name)
             => new MemberBinder(target, name);
 

@@ -38,7 +38,7 @@ DECLARE FUNCTION ASSERT_TRUE {
 // Getting vessel wrapper
 // -----------------------------------------------------------------------------
 PRINT "Getting Vessel wrapper...".
-SET mjVessel TO ADDONS:MJ:CORE:VESSEL.
+SET mjVessel TO ADDONS:MJ:VESSEL.
 PRINT "OK.".
 PRINT "-------------------------------".
 
