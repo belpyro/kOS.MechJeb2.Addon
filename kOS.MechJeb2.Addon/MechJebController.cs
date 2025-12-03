@@ -32,7 +32,7 @@ namespace kOS.MechJeb2.Addon
         public bool IsAvailable => _wrappers.All(w => w.Value.Initialized);
         
         public MechJebCoreWrapper Core => _wrappers[WrapperTypes.Core] as MechJebCoreWrapper;
-        public MechJebAscentWrapper AsceWrapper => _wrappers[WrapperTypes.Ascent] as MechJebAscentWrapper;
+        public MechJebAscentWrapper AscentWrapper => _wrappers[WrapperTypes.Ascent] as MechJebAscentWrapper;
         public VesselStateWrapper VesselState => _wrappers[WrapperTypes.Vessel] as VesselStateWrapper;
         public MechJebInfoItemsWrapper InfoItems => _wrappers[WrapperTypes.Info] as MechJebInfoItemsWrapper;
     }

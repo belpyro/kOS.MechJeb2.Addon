@@ -41,7 +41,7 @@ namespace kOS.MechJeb2.Addon
                 new NoArgsSuffix<VesselStateWrapper>(() => MechJebController.Instance.VesselState
                 ));
             AddSuffix(new[] { "ASCENT", "ASCENTGUIDANCE" }, new NoArgsSuffix<MechJebAscentWrapper>(() =>
-                MechJebController.Instance.AsceWrapper
+                MechJebController.Instance.AscentWrapper
             ));
             AddSuffix(new[] { "INFO" }, new NoArgsSuffix<MechJebInfoItemsWrapper>(() =>
                 MechJebController.Instance.InfoItems
