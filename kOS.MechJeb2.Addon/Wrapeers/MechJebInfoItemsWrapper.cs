@@ -263,14 +263,12 @@ namespace kOS.MechJeb2.Addon.Wrapeers
 
             foreach (var method in coreType.GetMethods(_methodFlags))
             {
-                // только методы без параметров с атрибутом ValueInfoItem
                 if (method.GetParameters().Length != 0)
                     continue;
 
                 if (!method.HasAttributeNamed("ValueInfoItemAttribute"))
                     continue;
-
-                // ищем одноимённое свойство в враппере
+                
                 var prop = wrapperType.GetProperty(method.Name, BindingFlags.Instance | BindingFlags.Public);
                 if (prop == null)
                     continue;

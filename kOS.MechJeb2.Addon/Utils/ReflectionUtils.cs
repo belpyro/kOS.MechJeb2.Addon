@@ -12,31 +12,6 @@ namespace kOS.MechJeb2.Addon.Utils
 
     public static class ReflectionUtils
     {
-        public static Delegate BuildTypedGetter(this MemberInfo member)
-        {
-            // (object obj) => (resultType)((DeclaringType)obj).Field
-            var objParam = Expression.Parameter(typeof(object), "obj");
-            var castObj = Expression.Convert(objParam, member.DeclaringType);
-            Expression valueExpr;
-            Type memberType;
-            if (member is PropertyInfo pi)
-            {
-                valueExpr = Expression.Property(castObj, pi);
-                memberType = pi.PropertyType;
-            }
-            else if (member is FieldInfo fi)
-            {
-                valueExpr = Expression.Field(castObj, fi);
-                memberType = fi.FieldType;
-            }
-            else
-                throw new NotSupportedException("Only fields and properties are supported");
-
-            var delegateType = typeof(Func<,>).MakeGenericType(typeof(object), memberType);
-
-            return Expression.Lambda(delegateType, valueExpr, objParam).Compile();
-        }
-
         private static readonly Dictionary<MethodInfo, LateBoundMethod> methodCache =
             new Dictionary<MethodInfo, LateBoundMethod>();
 
@@ -222,15 +197,6 @@ namespace kOS.MechJeb2.Addon.Utils
             var info = attr.InformationalVersion.ToLower() ?? "";
 
             return info.Contains("Dev".ToLower());
-        }
-
-        public static VersionInfo GetGitVersionInfo()
-        {
-            var type = typeof(ReflectionUtils).Assembly.GetType("GitVersionInformation");
-            var major = type.GetField("Major", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Static)?.GetValue(null);
-            var minor = type.GetField("Minor", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Static)?.GetValue(null);
-            var patch = type.GetField("Patch", BindingFlags.Public | BindingFlags.IgnoreCase | BindingFlags.Static)?.GetValue(null);
-            return new VersionInfo(int.Parse(major.ToString()), int.Parse(minor.ToString()), int.Parse(patch.ToString()),0);
         }
         
         internal static Type GetTypeFromCache(this string name)
