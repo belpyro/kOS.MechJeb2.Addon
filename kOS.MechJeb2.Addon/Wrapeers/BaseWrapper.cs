@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using kOS.MechJeb2.Addon.Core;
 using kOS.MechJeb2.Addon.Utils;
 using kOS.Safe.Encapsulation;
@@ -12,13 +13,101 @@ namespace kOS.MechJeb2.Addon.Wrapeers
     [KOSNomenclature("BaseWrapper")]
     public abstract class BaseWrapper : Structure, IBaseWrapper, ILogContextProvider
     {
-        protected PartModule MasterMechJeb => FlightGlobals.fetch.activeVessel.GetMasterMJ();
+        // Cached reflection info for getting fresh MasterMechJeb
+        private static MethodInfo _getMasterMechJebMethod;
+        private static bool _reflectionInitialized;
+
+        // Cached MasterMechJeb reference - may become stale after save reload
+        private PartModule _cachedMasterMechJeb;
+
+        /// <summary>
+        /// Gets MasterMechJeb, automatically refreshing from FlightGlobals.ActiveVessel if the cached instance is stale.
+        /// This handles save reloads where the old MasterMechJeb becomes a destroyed Unity object ("fake null").
+        /// </summary>
+        protected PartModule MasterMechJeb
+        {
+            get
+            {
+                // Check if cached reference is still valid
+                if (_cachedMasterMechJeb != null)
+                {
+                    try
+                    {
+                        // Accessing ToString() on a destroyed Unity object throws or returns "null"
+                        if (_cachedMasterMechJeb.ToString() != "null")
+                            return _cachedMasterMechJeb;
+                    }
+                    catch
+                    {
+                        // Fall through to get fresh instance
+                    }
+                }
+
+                // MasterMechJeb is stale or null - get a fresh one from the active vessel
+                _cachedMasterMechJeb = GetFreshMasterMechJeb();
+                return _cachedMasterMechJeb;
+            }
+        }
+
+        /// <summary>
+        /// Gets a fresh MasterMechJeb from FlightGlobals.ActiveVessel using reflection.
+        /// </summary>
+        private static PartModule GetFreshMasterMechJeb()
+        {
+            if (!_reflectionInitialized)
+            {
+                var vesselExtensionType = Constants.VesselExtensionName.GetTypeFromCache();
+                if (vesselExtensionType != null)
+                {
+                    _getMasterMechJebMethod = vesselExtensionType.GetMethod("GetMasterMechJeb",
+                        BindingFlags.Public | BindingFlags.Static);
+                }
+                _reflectionInitialized = true;
+            }
+
+            if (_getMasterMechJebMethod == null)
+                return null;
+
+            var vessel = FlightGlobals.ActiveVessel;
+            if (vessel == null)
+                return null;
+
+            // Check if vessel is valid (not a destroyed Unity object)
+            try
+            {
+                var _ = vessel.vesselName;
+            }
+            catch
+            {
+                return null;
+            }
+
+            try
+            {
+                return _getMasterMechJebMethod.Invoke(null, new object[] { vessel }) as PartModule;
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         public void Initialize()
         {
             BindObject();
             RegisterInitializer(InitializeSuffixes);
             Initialized = true;
+        }
+
+        /// <summary>
+        /// Reinitialize the wrapper, clearing any cached references.
+        /// Called when GameEvents signal that the scene or vessel has changed.
+        /// </summary>
+        public virtual void Reinitialize()
+        {
+            _cachedMasterMechJeb = null;
+            Initialized = false;
+            Initialize();
         }
 
         public bool Initialized { get; protected set; }

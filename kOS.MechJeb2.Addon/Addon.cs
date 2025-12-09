@@ -27,6 +27,14 @@ namespace kOS.MechJeb2.Addon
         public override BooleanValue Available()
         {
             Log.Debug("MJAddon.Available() called");
+
+            // Check if GameEvents triggered reinitialization (save reload, vessel change, scene change)
+            if (MechJebController.NeedsReinitialization)
+            {
+                Log.Debug("NeedsReinitialization flag set - forcing reinitialization");
+                MechJebController.Instance.ForceReinitialize();
+            }
+
             return MechJebController.Instance.IsAvailable;
         }
 
