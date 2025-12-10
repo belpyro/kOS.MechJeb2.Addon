@@ -17,34 +17,46 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         private static MethodInfo _getMasterMechJebMethod;
         private static bool _reflectionInitialized;
 
-        // Cached MasterMechJeb reference - may become stale after save reload
+        // Cached MasterMechJeb reference - may become stale after save reload or vessel switch
         private PartModule _cachedMasterMechJeb;
+        // Track which vessel the cached MasterMechJeb belongs to
+        private Vessel _cachedVessel;
 
         /// <summary>
         /// Gets MasterMechJeb, automatically refreshing from FlightGlobals.ActiveVessel if the cached instance is stale.
-        /// This handles save reloads where the old MasterMechJeb becomes a destroyed Unity object ("fake null").
+        /// This handles:
+        /// - Save reloads where the old MasterMechJeb becomes a destroyed Unity object ("fake null")
+        /// - Vessel switches where we need MechJeb from the new active vessel
         /// </summary>
         protected PartModule MasterMechJeb
         {
             get
             {
-                // Check if cached reference is still valid
-                if (_cachedMasterMechJeb != null)
+                var activeVessel = FlightGlobals.ActiveVessel;
+
+                // Check if cached reference is still valid AND belongs to the current active vessel
+                if (_cachedMasterMechJeb != null && _cachedVessel != null)
                 {
                     try
                     {
-                        // Accessing ToString() on a destroyed Unity object throws or returns "null"
-                        if (_cachedMasterMechJeb.ToString() != "null")
+                        // Check if the cached vessel is still the active vessel
+                        // Using ReferenceEquals for identity check, then validate both aren't destroyed
+                        if (ReferenceEquals(_cachedVessel, activeVessel) &&
+                            _cachedVessel.ToString() != "null" &&
+                            _cachedMasterMechJeb.ToString() != "null")
+                        {
                             return _cachedMasterMechJeb;
+                        }
                     }
                     catch
                     {
-                        // Fall through to get fresh instance
+                        // Fall through to get fresh instance - object was destroyed
                     }
                 }
 
-                // MasterMechJeb is stale or null - get a fresh one from the active vessel
+                // MasterMechJeb is stale, wrong vessel, or null - get a fresh one
                 _cachedMasterMechJeb = GetFreshMasterMechJeb();
+                _cachedVessel = activeVessel;
                 return _cachedMasterMechJeb;
             }
         }
@@ -106,6 +118,7 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         public virtual void Reinitialize()
         {
             _cachedMasterMechJeb = null;
+            _cachedVessel = null;
             Initialized = false;
             Initialize();
         }

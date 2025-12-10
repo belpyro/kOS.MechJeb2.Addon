@@ -41,7 +41,25 @@ namespace kOS.MechJeb2.Addon
 
         private static MechJebController _instance;
 
-        public static MechJebController Instance => _instance ??= new MechJebController();
+        public static MechJebController Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new MechJebController();
+                }
+
+                // Retry event subscription if it failed during construction
+                // (GameEvents may not have been ready during scene transitions)
+                if (!_eventsSubscribed)
+                {
+                    EnsureEventsSubscribed();
+                }
+
+                return _instance;
+            }
+        }
 
         public bool IsAvailable => _wrappers.All(w => w.Value.Initialized);
 
