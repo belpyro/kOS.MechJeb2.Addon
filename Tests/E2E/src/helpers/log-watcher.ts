@@ -151,7 +151,7 @@ export async function checkRecentLogs(
 export async function waitForFlightScene(timeoutMs: number): Promise<void> {
   console.log('  Waiting for KSP flight scene...');
 
-  // Fast path: check recent logs first (like bash script does with tail -500)
+  // Fast path: check recent 500 lines first
   const recent = await checkRecentLogs(PLAYER_LOG, LOG_PATTERNS.FLIGHT_SCENE);
   if (recent) {
     console.log('  Flight scene already loaded');
@@ -181,8 +181,6 @@ export async function waitForKosTelnet(timeoutMs: number): Promise<void> {
 
 /**
  * Check for pattern in log lines after a specific start line
- *
- * Like bash: tail -n +"$START_LINE" "$PLAYER_LOG" | grep -q "$PATTERN"
  */
 export async function checkLogAfterLine(
   logPath: string,
@@ -198,7 +196,7 @@ export async function checkLogAfterLine(
     const lines = content.split('\n');
     const regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
 
-    // Check lines after startLine (1-indexed like bash)
+    // Check lines after startLine (1-indexed)
     for (let i = startLine; i < lines.length; i++) {
       if (regex.test(lines[i])) {
         return true;

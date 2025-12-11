@@ -9,6 +9,7 @@ import { ManeuverProgram, AscentProgram } from 'ksp-mcp/mechjeb';
 import { KOS_CPU_LABEL, TIMEOUTS, SAVES } from '../config.js';
 import { initializeKsp } from './ksp-launcher.js';
 import { waitForKosReady } from './kos-waiter.js';
+import { validateEnvironment, formatValidationResult } from '../validate-environment.js';
 
 // Shared instances
 let conn: KosConnection | null = null;
@@ -79,7 +80,6 @@ export async function ensureKspReady(
 
 /**
  * Clear ALL existing maneuver nodes
- * Mirrors bash helper: FOR N IN ALLNODES { REMOVE N. }
  */
 export async function clearNodes(): Promise<void> {
   const connection = await getConnection();
@@ -92,6 +92,19 @@ beforeAll(async () => {
   console.log('\n========================================');
   console.log('E2E Test Suite Starting');
   console.log('========================================\n');
+
+  // Run environment validation first
+  const validation = await validateEnvironment();
+  if (!validation.valid) {
+    console.error(formatValidationResult(validation));
+    console.error('\nSee Tests/E2E/README.md for setup instructions.\n');
+    throw new Error('Environment validation failed');
+  }
+
+  // Show any warnings or copied assets
+  if (validation.warnings.length > 0 || validation.assetsCopied.length > 0) {
+    console.log(formatValidationResult(validation));
+  }
 }, TIMEOUTS.KSP_STARTUP);
 
 // Jest global teardown

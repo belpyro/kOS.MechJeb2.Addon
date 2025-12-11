@@ -133,7 +133,6 @@ export function getLastSave(): string | null {
  * Clear all maneuver nodes via kOS
  *
  * Uses the ksp-mcp daemon to execute: FOR N IN ALLNODES { REMOVE N. }
- * Like bash clear-nodes.sh
  */
 export async function clearNodes(): Promise<boolean> {
   try {
@@ -217,9 +216,9 @@ export async function reloadSave(saveName: string): Promise<void> {
     const logLinesBefore = getLogLineCount();
     const startAfter = logLinesBefore + 1;
 
-    // Path to the AppleScript in E2E-TS directory
+    // Path to the AppleScript in E2E/asset directory
     const __filename = fileURLToPath(import.meta.url);
-    const scriptPath = join(dirname(dirname(dirname(__filename))), 'LoadSaveKSP.scpt');
+    const scriptPath = join(dirname(dirname(dirname(__filename))), 'asset', 'LoadSaveKSP.scpt');
 
     try {
       // Run the AppleScript with the save name as argument
@@ -242,8 +241,6 @@ export async function reloadSave(saveName: string): Promise<void> {
 
 /**
  * Check if kOS telnet is ready (quick TCP check)
- *
- * Like bash: timeout 1 bash -c "echo > /dev/tcp/127.0.0.1/5410"
  */
 async function isKosReady(): Promise<boolean> {
   try {
@@ -257,7 +254,7 @@ async function isKosReady(): Promise<boolean> {
 /**
  * Initialize KSP for tests
  *
- * Follows bash with-test-helpers.sh pattern:
+ * Optimizes for test speed:
  * - KSP running + same save + kOS responding → clear nodes only (fast path)
  * - KSP running + different save + macOS → AppleScript reload
  * - KSP running + different save + non-macOS → kill + restart KSP
@@ -314,10 +311,8 @@ export async function initializeKsp(
 /**
  * Wait for KSP to be fully ready
  *
- * Uses same approach as bash:
  * 1. Wait for flight scene (log watching)
  * 2. Wait for kOS telnet ready (TCP port check with "Choose a CPU" validation)
- * 3. Wait for vessel initialization (log watching)
  */
 async function waitForKspReady(): Promise<void> {
   console.log('  Waiting for KSP to be ready...');
@@ -325,8 +320,7 @@ async function waitForKspReady(): Promise<void> {
   // Wait for flight scene (log-based)
   await waitForFlightScene(TIMEOUTS.KSP_STARTUP);
 
-  // Wait for kOS telnet via TCP (like bash wait-for-kos.sh - NOT log-based)
-  // This validates "Choose a CPU" response, which means vessel is initialized
+  // Wait for kOS telnet via TCP (validates "Choose a CPU" response)
   await waitForKos(TIMEOUTS.KOS_READY);
 
   console.log('  KSP is ready!');

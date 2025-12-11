@@ -19,8 +19,7 @@ export default {
     ],
   },
   // Run tests in mission order (ascent, circularize, changeap, etc.)
-  // This matches the bash validate-all-tests.sh ordering
-  testSequencer: './mission-sequencer.cjs',
+  testSequencer: './src/mission-sequencer.cjs',
   // Verbose output to see test progress
   verbose: true,
 };

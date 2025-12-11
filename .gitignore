@@ -183,6 +183,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+[Rr]eferences/
 
 # Visual Studio 2015/2017 cache/options directory
 # Uncomment if you have tasks that create the project's static files in wwwroot
@@ -385,6 +386,7 @@ ClientBin/
 *.pfx
 *.publishsettings
 orleans.codegen.cs
+.DS_Store
 
 # Including strong name files can present a security risk
 # (https://github.com/github/gitignore/pull/2483#issue-259490424)

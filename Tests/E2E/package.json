@@ -4,6 +4,7 @@
   "description": "TypeScript E2E tests for kOS.MechJeb2.Addon",
   "type": "module",
   "scripts": {
+    "validate": "npx tsx src/validate-environment.ts",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "test:circularize": "cross-env NODE_OPTIONS=--experimental-vm-modules jest circularize",

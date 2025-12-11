@@ -1,6 +1,10 @@
 /**
  * Custom Jest sequencer to run tests in mission order
  *
+ * NOTE: This file must be CommonJS (.cjs) because Jest loads test sequencers
+ * directly via require() before any ESM transforms run. The rest of the project
+ * uses ESM, but this file cannot.
+ *
  * Tests are ordered to simulate a real space mission:
  * 1. Launch & orbit establishment (ascent, circularize)
  * 2. Basic orbit adjustments (changeap, changepe, ellipticize)
@@ -12,7 +16,7 @@
 
 const Sequencer = require('@jest/test-sequencer').default;
 
-// Mission order - matches bash validate-all-tests.sh
+// Mission order for test execution
 const MISSION_ORDER = [
   'ascent',
   'circularize',

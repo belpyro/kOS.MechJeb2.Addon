@@ -9,8 +9,6 @@ import { KOS_HOST, KOS_PORT, TIMEOUTS } from '../config.js';
 
 /**
  * Check if kOS telnet is ready by validating "Choose a CPU" response
- *
- * This matches the bash implementation: echo "" | nc -w 1 127.0.0.1 5410 | grep -q "Choose a CPU"
  */
 export async function isKosReady(): Promise<boolean> {
   return new Promise((resolve) => {
@@ -23,7 +21,7 @@ export async function isKosReady(): Promise<boolean> {
     }, 2000);
 
     socket.once('connect', () => {
-      // Send empty line like bash does
+      // Send empty line to trigger CPU list response
       socket.write('\n');
     });
 
@@ -81,7 +79,7 @@ export async function isKosPortOpen(): Promise<boolean> {
 /**
  * Wait for kOS telnet server to be accessible and ready
  *
- * Uses isKosReady() to validate "Choose a CPU" response, matching bash behavior.
+ * Uses isKosReady() to validate "Choose a CPU" response.
  *
  * @param timeoutMs Timeout in milliseconds
  * @param pollIntervalMs Polling interval

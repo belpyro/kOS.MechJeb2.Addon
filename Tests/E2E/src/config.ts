@@ -14,7 +14,7 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load .env file from E2E-TS directory
+// Load .env file from E2E directory
 config({ path: join(__dirname, '..', '.env') });
 
 // Platform detection
@@ -29,7 +29,7 @@ function getRequiredEnv(name: string): string {
   if (!value) {
     throw new Error(
       `ERROR: ${name} environment variable not set.\n` +
-      `Create Tests/E2E-TS/.env with: ${name}=/path/to/Kerbal Space Program`
+      `Create Tests/E2E/.env with: ${name}=/path/to/Kerbal Space Program`
     );
   }
   return value;
@@ -92,9 +92,9 @@ export const LOG_PATTERNS = {
 
 // Save configurations
 export const SAVES = {
-  ORBIT: 'test2',      // Ship in orbit (for maneuver tests)
-  LAUNCHPAD: 'test1',  // Ship on launchpad (for ascent tests)
-  DIRECTORY: 'a_test',
+  ORBIT: 'test-in-orbit',  // Ship in orbit (for maneuver tests)
+  LAUNCHPAD: 'persistent', // Ship on launchpad (for ascent tests)
+  DIRECTORY: 'stock',
 };
 
 /**
