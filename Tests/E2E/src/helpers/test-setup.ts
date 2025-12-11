@@ -6,10 +6,11 @@
 
 import { KosConnection } from 'ksp-mcp/transport';
 import { ManeuverProgram, AscentProgram } from 'ksp-mcp/mechjeb';
-import { KOS_CPU_LABEL, TIMEOUTS, SAVES } from '../config.js';
-import { initializeKsp } from './ksp-launcher.js';
+import { KOS_CPU_LABEL, TIMEOUTS, SAVES, LAST_TEST_FILE } from '../config.js';
+import { initializeKsp, recordLastSave } from './ksp-launcher.js';
 import { waitForKosReady } from './kos-waiter.js';
 import { validateEnvironment, formatValidationResult } from '../validate-environment.js';
+import { writeFileSync, readFileSync, existsSync } from 'fs';
 
 // Shared instances
 let conn: KosConnection | null = null;
@@ -53,18 +54,64 @@ export async function getAscentProgram(): Promise<AscentProgram> {
 }
 
 /**
+ * Record that a test completed successfully (persists to temp file for cross-worker access)
+ *
+ * Used for chaining logic - e.g., circularize can chain after ascent
+ * because the vessel is already in orbit.
+ */
+export function recordTestSuccess(testName: string): void {
+  writeFileSync(LAST_TEST_FILE, testName);
+  console.log(`  Recorded successful test: ${testName}`);
+}
+
+/**
+ * Get the last successful test name (reads from temp file)
+ */
+export function getLastSuccessfulTest(): string | null {
+  try {
+    if (existsSync(LAST_TEST_FILE)) {
+      return readFileSync(LAST_TEST_FILE, 'utf-8').trim();
+    }
+  } catch {
+    // File doesn't exist or not readable
+  }
+  return null;
+}
+
+/**
  * Ensure KSP is ready with the correct save
  *
  * @param saveName Save file to load
- * @param options.forceRestart Always kill KSP and do fresh launch (required for ASCENT - vessel must be on pad)
+ * @param options.forceRestart Always kill KSP and do fresh launch
  * @param options.forceReload Skip same-save optimization but allow hot reload (for tests that change vessel state)
+ * @param options.chainAfter Array of test names - if last successful test matches, skip reload (vessel state is already correct)
  */
 export async function ensureKspReady(
   saveName: string,
-  options: { forceRestart?: boolean; forceReload?: boolean } = {}
+  options: { forceRestart?: boolean; forceReload?: boolean; chainAfter?: string[] } = {}
 ): Promise<void> {
+  const { chainAfter, ...initOptions } = options;
+
+  // Check for chaining opportunity (uses file-based persistence for cross-worker access)
+  const lastTest = getLastSuccessfulTest();
+  if (chainAfter && lastTest && chainAfter.includes(lastTest)) {
+    console.log(`  Chaining after ${lastTest} - skipping save reload`);
+    // Update save tracking to match the new save context
+    // This allows subsequent tests to use the normal fast-path
+    currentSave = saveName;
+    recordLastSave(saveName);  // Update temp file so initializeKsp knows
+    // Just ensure connection is ready, don't reload
+    if (conn && !conn.isConnected()) {
+      conn = null;
+      maneuver = null;
+      ascent = null;
+    }
+    await getConnection();
+    return;
+  }
+
   // Initialize KSP (handles save switching and same-save optimization)
-  await initializeKsp(saveName, options);
+  await initializeKsp(saveName, initOptions);
   currentSave = saveName;
 
   // Reconnect if needed

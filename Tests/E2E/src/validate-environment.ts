@@ -144,7 +144,7 @@ async function copyTestAssets(kspDir: string, result: ValidationResult): Promise
   const autoLoadDest = join(autoLoadDestDir, 'AutoLoad.cfg');
   if (existsSync(autoLoadSource)) {
     if (existsSync(autoLoadDest)) {
-      result.warnings.push(`AutoLoad.cfg already exists - skipping: ${autoLoadDest}`);
+      // File already exists - this is fine, don't warn
     } else if (existsSync(autoLoadDestDir)) {
       // Only copy if the KSP-AutoLoad directory exists (mod is installed)
       copyFileSync(autoLoadSource, autoLoadDest);
@@ -175,9 +175,8 @@ function copyDirectoryWithWarnings(src: string, dest: string, result: Validation
     if (stat.isDirectory()) {
       copyDirectoryWithWarnings(srcPath, destPath, result);
     } else {
-      if (existsSync(destPath)) {
-        result.warnings.push(`File exists, skipping: ${destPath}`);
-      } else {
+      // Only copy if destination doesn't exist (don't overwrite user files)
+      if (!existsSync(destPath)) {
         copyFileSync(srcPath, destPath);
         result.assetsCopied.push(destPath);
       }

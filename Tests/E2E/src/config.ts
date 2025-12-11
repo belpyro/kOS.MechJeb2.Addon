@@ -66,6 +66,7 @@ export const PLAYER_LOG = process.env.PLAYER_LOG || (() => {
 
 // State tracking - use os.tmpdir() for cross-platform support
 export const LAST_SAVE_FILE = join(tmpdir(), 'ksp-e2e-last-save');
+export const LAST_TEST_FILE = join(tmpdir(), 'ksp-e2e-last-test');
 
 // kOS connection settings
 export const KOS_HOST = '127.0.0.1';
@@ -92,8 +93,8 @@ export const LOG_PATTERNS = {
 
 // Save configurations
 export const SAVES = {
-  ORBIT: 'test-in-orbit',  // Ship in orbit (for maneuver tests)
-  LAUNCHPAD: 'persistent', // Ship on launchpad (for ascent tests)
+  ORBIT: 'test-in-orbit',   // Ship in orbit (for maneuver tests)
+  LAUNCHPAD: 'test-on-pad', // Ship on launchpad (for ascent tests)
   DIRECTORY: 'stock',
 };
 
@@ -121,6 +122,7 @@ export const config_obj = {
   PLAYER_LOG,
   AUTOLOAD_CONFIG,
   LAST_SAVE_FILE,
+  LAST_TEST_FILE,
   KOS_HOST,
   KOS_PORT,
   KOS_CPU_LABEL,

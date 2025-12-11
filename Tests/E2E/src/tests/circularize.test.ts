@@ -8,7 +8,8 @@ import { ensureKspReady, getManeuverProgram, clearNodes, SAVES } from '../helper
 
 describe('CIRCULARIZE', () => {
   beforeAll(async () => {
-    await ensureKspReady(SAVES.ORBIT);
+    // Can chain after ascent - vessel is already in orbit, no reload needed
+    await ensureKspReady(SAVES.ORBIT, { chainAfter: ['ascent'] });
   });
 
   beforeEach(async () => {

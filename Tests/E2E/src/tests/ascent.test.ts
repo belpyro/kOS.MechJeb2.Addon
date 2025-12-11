@@ -5,7 +5,7 @@
  * This test uses the launchpad save and requires more time.
  */
 
-import { ensureKspReady, getAscentProgram, SAVES, TIMEOUTS } from '../helpers/test-setup.js';
+import { ensureKspReady, getAscentProgram, recordTestSuccess, SAVES, TIMEOUTS } from '../helpers/test-setup.js';
 
 describe('ASCENT', () => {
   beforeAll(async () => {
@@ -37,5 +37,8 @@ describe('ASCENT', () => {
     const result = await handle.waitForCompletion();
     expect(result.success).toBe(true);
     console.log(`  Final orbit: ${Math.round(result.finalOrbit.apoapsis / 1000)}km x ${Math.round(result.finalOrbit.periapsis / 1000)}km`);
+
+    // Record success - allows circularize to chain without reload
+    recordTestSuccess('ascent');
   }, TIMEOUTS.BURN_EXECUTION);
 });

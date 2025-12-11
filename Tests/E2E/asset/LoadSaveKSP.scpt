@@ -10,7 +10,7 @@ Just brings KSP to foreground and loads specified save
 --------------------------------------------------------
 on pressKey(keyChar)
     tell application "System Events" to keystroke keyChar
-    delay 1
+    delay 0.5
 end pressKey
 
 on pressSpecial(vKey)
@@ -28,9 +28,9 @@ log "📂 Loading KSP save (quick reload, no full restart)"
 delay 1
 
 --------------------------------------------------------
--- Get save name from arguments (default: test2)
+-- Get save name from arguments (default: test-in-orbit)
 --------------------------------------------------------
-set targetSaveName to "test2"
+set targetSaveName to "test-in-orbit"
 if (count of argv) > 0 then
     set targetSaveName to item 1 of argv
     log "📌 Loading save: " & targetSaveName
@@ -79,13 +79,15 @@ pressSpecial(36)  -- Return
 delay 2
 
 --------------------------------------------------------
--- Search for target save name
+-- Search for target save
 --------------------------------------------------------
 log "Searching for save: " & targetSaveName
 pressSpecial(48)  -- Tab to search field
+
 repeat with char in targetSaveName
     pressKey(char as text)
 end repeat
+
 pressSpecial(36)  -- Return
 
 --------------------------------------------------------

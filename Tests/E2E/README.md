@@ -1,7 +1,9 @@
 # E2E Tests for kOS.MechJeb2.Addon
 
 End-to-end TypeScript tests for the kOS MechJeb2 addon. These tests run actual
-maneuvers in KSP to verify the addon works correctly.
+maneuvers in KSP to verify addon features works as expected.  These tests have been
+developed on my Mac.  I've tried to support Windows and Linux test runs - but do not
+have an easy way to run the tests there.
 
 ## Prerequisites
 
@@ -54,7 +56,8 @@ npm install
 ```
 
 **Important**: The `ksp-mcp` package provides `KosConnection` for kOS telnet
-communication and the kOS.MechJeb2.Addon calls.
+communication and the kOS.MechJeb2.Addon calls.  It's in developemt as well
+and right now npm is just pulling from my Github - will get this in NPM.
 
 ### 4. Test Assets
 
@@ -73,10 +76,10 @@ Copy-Item asset\AutoLoad.cfg "$env:KSP_DIR\GameData\KSP-AutoLoad\"
 ## Running Tests
 
 ```bash
-# Validate environment only (quick check)
+# Validate environment only
 npm run validate
 
-# Run all tests (mission order)
+# Run all tests (mission order - tries to 'chain' tests to save time on reloads)
 npm test
 
 # Run specific test
@@ -104,6 +107,9 @@ Tests run in mission order (via custom sequencer):
 10. **resonant** - Resonant orbit
 
 ## Platform Support
+
+I was able to get KSP to load a save with a hacky Applescript. It does speed up test runs,
+but looking for a beter solution still.  Or maybe we just need a hack for each platform?
 
 | Platform | KSP Launch | Hot Reload | Player.log |
 |----------|------------|------------|------------|
@@ -141,7 +147,7 @@ Run `npm install` in the Tests/E2E directory.
 
 ### Save file issues
 - The test uses saves in `saves/stock/` directory
-- `persistent.sfs` - Vessel on launchpad (ascent tests)
+- `test-on-pad.sfs` - Vessel on launchpad (ascent tests)
 - `test-in-orbit.sfs` - Vessel in orbit (maneuver tests)
 
 ## Architecture
@@ -188,5 +194,5 @@ The build script auto-deploys to KSP GameData via KSPBuildTools. After building:
 When adding new tests:
 1. Follow the existing test pattern in `src/tests/`
 2. Use `ensureKspReady(SAVES.ORBIT)` or `ensureKspReady(SAVES.LAUNCHPAD)`
-3. Call `clearNodes()` in `beforeEach` to ensure clean state
+3. Call `clearNodes()` in `beforeEach` to ensure clean state in 'chained'
 4. Add the test to `mission-sequencer.cjs` if order matters
