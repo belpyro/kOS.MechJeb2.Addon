@@ -1,6 +1,9 @@
 // MJ_TestRunner.ks
 // Menu runner for MechJeb kOS wrapper tests using Terminal:INPUT
 
+// Ensure we're running from archive (where the test scripts are)
+SWITCH TO 0.
+
 CLEARSCREEN.
 PRINT "===============================".
 PRINT "   MechJeb kOS Tests Runner    ".
@@ -22,7 +25,7 @@ DECLARE FUNCTION WAIT_FOR_KEY {
 
 // Read a single-character menu choice using Terminal:INPUT
 DECLARE FUNCTION READ_MENU_CHOICE {
-    PARAMETER prompt IS "Enter choice (0–7): ".
+    PARAMETER prompt IS "Enter choice: ".
 
     LOCAL ti IS TERMINAL:INPUT.
     LOCAL ch IS "".
@@ -45,14 +48,18 @@ SET running TO TRUE.
 UNTIL NOT running {
 
     PRINT "".
-    PRINT "Select test suite to run (press key 0–8):".
+    PRINT "Select test suite to run:".
     PRINT "  1) Core wrapper tests".
     PRINT "  2) Vessel wrapper tests".
     PRINT "  3) Info wrapper tests".
     PRINT "  4) Ascent wrapper tests".
     PRINT "  5) Maneuver Planner wrapper tests".
-    PRINT "  6) Node Executor wrapper tests".
-    PRINT "  7) Run ALL tests (1–6)".
+    PRINT "  6) Basic maneuver tests".
+    PRINT "  7) Orbital geometry tests".
+    PRINT "  8) Rendezvous tests".
+    PRINT "  9) Transfer tests".
+    PRINT "  A) Node Executor wrapper tests".
+    PRINT "  B) Run ALL tests".
     PRINT "  0) Exit".
     PRINT "".
 
@@ -95,11 +102,35 @@ UNTIL NOT running {
 
     } ELSE IF choice = "6" {
         PRINT "".
+        PRINT "Running Basic maneuver tests...".
+        RUN maneuverplannerbasictest.
+        WAIT_FOR_KEY().
+
+    } ELSE IF choice = "7" {
+        PRINT "".
+        PRINT "Running Orbital geometry tests...".
+        RUN maneuverplannerorbitaltest.
+        WAIT_FOR_KEY().
+
+    } ELSE IF choice = "8" {
+        PRINT "".
+        PRINT "Running Rendezvous tests...".
+        RUN maneuverplannerrendezvoustest.
+        WAIT_FOR_KEY().
+
+    } ELSE IF choice = "9" {
+        PRINT "".
+        PRINT "Running Transfer tests...".
+        RUN maneuverplannertransfertest.
+        WAIT_FOR_KEY().
+
+    } ELSE IF choice = "A" OR choice = "a" {
+        PRINT "".
         PRINT "Running NodeExecutor wrapper tests...".
         RUN nodeexecutorwrappertest.
         WAIT_FOR_KEY().
 
-    } ELSE IF choice = "7" {
+    } ELSE IF choice = "B" OR choice = "b" {
         PRINT "".
         PRINT "Running ALL test suites...".
 
@@ -123,13 +154,29 @@ UNTIL NOT running {
         RUN maneuverplannerwrappertest.
         WAIT_FOR_KEY().
 
+        PRINT "---------------- BASIC ---------------".
+        RUN maneuverplannerbasictest.
+        WAIT_FOR_KEY().
+
+        PRINT "---------------- ORBITAL -------------".
+        RUN maneuverplannerorbitaltest.
+        WAIT_FOR_KEY().
+
+        PRINT "---------------- RENDEZVOUS ----------".
+        RUN maneuverplannerrendezvoustest.
+        WAIT_FOR_KEY().
+
+        PRINT "---------------- TRANSFER ------------".
+        RUN maneuverplannertransfertest.
+        WAIT_FOR_KEY().
+
         PRINT "---------------- NODE ----------------".
         RUN nodeexecutorwrappertest.
         WAIT_FOR_KEY().
 
     } ELSE {
         PRINT "".
-        PRINT "Unknown choice: " + choice + " (expected 0–7).".
+        PRINT "Unknown choice: " + choice + " (expected 0-9, A, B).".
         WAIT_FOR_KEY().
     }.
 }.

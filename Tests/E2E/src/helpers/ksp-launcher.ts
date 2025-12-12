@@ -5,9 +5,8 @@
  */
 
 import { spawn, execSync, exec } from 'child_process';
-import { writeFileSync, existsSync, unlinkSync, readFileSync, mkdirSync } from 'fs';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { writeFileSync, existsSync, readFileSync, mkdirSync } from 'fs';
+import { dirname } from 'path';
 import {
   KSP_APP,
   KSP_SAVES,
@@ -17,11 +16,10 @@ import {
   SAVES,
   TIMEOUTS,
   isMacOS,
-  isLinux,
   isWindows,
   saveExists,
 } from '../config.js';
-import { waitForFlightScene, getLogLineCount } from './log-watcher.js';
+import { waitForFlightScene } from './log-watcher.js';
 import { waitForKos, delay } from './kos-waiter.js';
 
 /**
@@ -196,9 +194,12 @@ export async function launchKsp(
 }
 
 /**
- * Reload save in running KSP (hot reload on macOS)
+ * Reload save in running KSP using KUNIVERSE:QUICKLOADFROM
  *
- * @param saveName Save file to load
+ * Uses kOS KUNIVERSE API for cross-platform save loading.
+ * Falls back to full KSP restart if KUNIVERSE fails.
+ *
+ * @param saveName Save file to load (quicksave name, not .sfs file)
  */
 export async function reloadSave(saveName: string): Promise<void> {
   console.log(`\nReloading save: ${saveName}`);
@@ -208,33 +209,35 @@ export async function reloadSave(saveName: string): Promise<void> {
     throw new Error(`Save file not found: ${saveName}`);
   }
 
-  if (isMacOS && isKspRunning()) {
-    // macOS: Use LoadSaveKSP.scpt AppleScript for hot reload
-    console.log('  Using LoadSaveKSP.scpt hot reload...');
-
-    // Record current log position BEFORE reload (to detect NEW initialization)
-    const logLinesBefore = getLogLineCount();
-    const startAfter = logLinesBefore + 1;
-
-    // Path to the AppleScript in E2E/asset directory
-    const __filename = fileURLToPath(import.meta.url);
-    const scriptPath = join(dirname(dirname(dirname(__filename))), 'asset', 'LoadSaveKSP.scpt');
+  if (isKspRunning()) {
+    // Use KUNIVERSE:QUICKLOADFROM via ksp-mcp daemon for hot reload
+    console.log('  Using KUNIVERSE:QUICKLOADFROM hot reload...');
 
     try {
-      // Run the AppleScript with the save name as argument
-      // The script handles: ESC to clear menus, pause menu, load game, search, select, load
-      execSync(`"${scriptPath}" ${saveName}`, { timeout: 60000 });
+      // Import the daemon client dynamically to avoid circular deps
+      const { execute, shutdown } = await import('ksp-mcp/daemon');
+
+      // Execute the quickload command
+      await execute(`KUNIVERSE:QUICKLOADFROM("${saveName}").`);
       recordLastSave(saveName);
+
+      // Shutdown daemon - connection is stale after scene reload
+      console.log('  Shutting down daemon (connection reset after reload)...');
+      await shutdown();
+
+      // Wait a bit for scene to settle
+      await delay(3000);
 
       // Wait for kOS telnet to respond with "Choose a CPU" (validates vessel is ready)
       console.log('  Waiting for kOS to be ready...');
       await waitForKos(TIMEOUTS.VESSEL_INIT);
     } catch (err) {
-      console.log('  Hot reload failed, falling back to restart...');
+      console.log(`  Hot reload failed: ${err instanceof Error ? err.message : String(err)}`);
+      console.log('  Falling back to restart...');
       await launchKsp(saveName);
     }
   } else {
-    // Other platforms: restart KSP
+    // KSP not running - fresh start
     await launchKsp(saveName);
   }
 }
