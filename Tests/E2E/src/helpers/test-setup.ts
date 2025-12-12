@@ -7,7 +7,7 @@
 import { KosConnection } from 'ksp-mcp/transport';
 import { ManeuverProgram, AscentProgram } from 'ksp-mcp/mechjeb';
 import { KOS_CPU_LABEL, TIMEOUTS, SAVES, LAST_TEST_FILE } from '../config.js';
-import { initializeKsp, recordLastSave } from './ksp-launcher.js';
+import { initializeKsp, recordLastSave, isKspRunning } from './ksp-launcher.js';
 import { waitForKosReady } from './kos-waiter.js';
 import { validateEnvironment, formatValidationResult } from '../validate-environment.js';
 import { writeFileSync, readFileSync, existsSync } from 'fs';
@@ -95,19 +95,25 @@ export async function ensureKspReady(
   // Check for chaining opportunity (uses file-based persistence for cross-worker access)
   const lastTest = getLastSuccessfulTest();
   if (chainAfter && lastTest && chainAfter.includes(lastTest)) {
-    console.log(`  Chaining after ${lastTest} - skipping save reload`);
-    // Update save tracking to match the new save context
-    // This allows subsequent tests to use the normal fast-path
-    currentSave = saveName;
-    recordLastSave(saveName);  // Update temp file so initializeKsp knows
-    // Just ensure connection is ready, don't reload
-    if (conn && !conn.isConnected()) {
-      conn = null;
-      maneuver = null;
-      ascent = null;
+    // Verify KSP is actually running before skipping initialization
+    // (LAST_TEST_FILE persists across Jest runs, so we might see a stale value)
+    if (!isKspRunning()) {
+      console.log(`  chainAfter matched ${lastTest} but KSP not running - initializing...`);
+    } else {
+      console.log(`  Chaining after ${lastTest} - skipping save reload`);
+      // Update save tracking to match the new save context
+      // This allows subsequent tests to use the normal fast-path
+      currentSave = saveName;
+      recordLastSave(saveName);  // Update temp file so initializeKsp knows
+      // Just ensure connection is ready, don't reload
+      if (conn && !conn.isConnected()) {
+        conn = null;
+        maneuver = null;
+        ascent = null;
+      }
+      await getConnection();
+      return;
     }
-    await getConnection();
-    return;
   }
 
   // Initialize KSP (handles save switching and same-save optimization)

@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "dotenv": "^16.0.0",
-    "ksp-mcp": "github:caseys/ksp-mcp"
+    "ksp-mcp": "^0.1.0"
   },
   "devDependencies": {
     "@types/jest": "^29.0.0",

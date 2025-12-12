@@ -73,61 +73,61 @@ UNTIL NOT running {
     } ELSE IF choice = "1" {
         PRINT "".
         PRINT "Running CoreWrapperTests...".
-        RUN corewrappertest.
+        RUN CoreWrapperTest.
         WAIT_FOR_KEY().
 
     } ELSE IF choice = "2" {
         PRINT "".
         PRINT "Running VesselWrapperTests...".
-        RUN vesselwrappertest.
+        RUN VesselWrapperTest.
         WAIT_FOR_KEY().
 
     } ELSE IF choice = "3" {
         PRINT "".
         PRINT "Running InfoWrapperTests...".
-        RUN infowrappertest.
+        RUN InfoWrapperTest.
         WAIT_FOR_KEY().
 
     } ELSE IF choice = "4" {
         PRINT "".
         PRINT "Running Ascent wrapper tests...".
-        RUN ascentwrappertest.
+        RUN AscentWrapperTest.
         WAIT_FOR_KEY().
 
     } ELSE IF choice = "5" {
         PRINT "".
         PRINT "Running ManeuverPlanner wrapper tests...".
-        RUN maneuverplannerwrappertest.
+        RUN ManeuverPlannerWrapperTest.
         WAIT_FOR_KEY().
 
     } ELSE IF choice = "6" {
         PRINT "".
         PRINT "Running Basic maneuver tests...".
-        RUN maneuverplannerbasictest.
+        RUN ManeuverPlannerBasicTest.
         WAIT_FOR_KEY().
 
     } ELSE IF choice = "7" {
         PRINT "".
         PRINT "Running Orbital geometry tests...".
-        RUN maneuverplannerorbitaltest.
+        RUN ManeuverPlannerOrbitalTest.
         WAIT_FOR_KEY().
 
     } ELSE IF choice = "8" {
         PRINT "".
         PRINT "Running Rendezvous tests...".
-        RUN maneuverplannerrendezvoustest.
+        RUN ManeuverPlannerRendezvousTest.
         WAIT_FOR_KEY().
 
     } ELSE IF choice = "9" {
         PRINT "".
         PRINT "Running Transfer tests...".
-        RUN maneuverplannertransfertest.
+        RUN ManeuverPlannerTransferTest.
         WAIT_FOR_KEY().
 
     } ELSE IF choice = "A" OR choice = "a" {
         PRINT "".
         PRINT "Running NodeExecutor wrapper tests...".
-        RUN nodeexecutorwrappertest.
+        RUN NodeExecutorWrapperTest.
         WAIT_FOR_KEY().
 
     } ELSE IF choice = "B" OR choice = "b" {
@@ -135,43 +135,43 @@ UNTIL NOT running {
         PRINT "Running ALL test suites...".
 
         PRINT "---------------- CORE ----------------".
-        RUN corewrappertest.
+        RUN CoreWrapperTest.
         WAIT_FOR_KEY().
 
         PRINT "---------------- VESSEL --------------".
-        RUN vesselwrappertest.
+        RUN VesselWrapperTest.
         WAIT_FOR_KEY().
 
         PRINT "---------------- INFO ----------------".
-        RUN infowrappertest.
+        RUN InfoWrapperTest.
         WAIT_FOR_KEY().
 
         PRINT "---------------- ASCENT --------------".
-        RUN ascentwrappertest.
+        RUN AscentWrapperTest.
         WAIT_FOR_KEY().
 
         PRINT "---------------- PLANNER -------------".
-        RUN maneuverplannerwrappertest.
+        RUN ManeuverPlannerWrapperTest.
         WAIT_FOR_KEY().
 
         PRINT "---------------- BASIC ---------------".
-        RUN maneuverplannerbasictest.
+        RUN ManeuverPlannerBasicTest.
         WAIT_FOR_KEY().
 
         PRINT "---------------- ORBITAL -------------".
-        RUN maneuverplannerorbitaltest.
+        RUN ManeuverPlannerOrbitalTest.
         WAIT_FOR_KEY().
 
         PRINT "---------------- RENDEZVOUS ----------".
-        RUN maneuverplannerrendezvoustest.
+        RUN ManeuverPlannerRendezvousTest.
         WAIT_FOR_KEY().
 
         PRINT "---------------- TRANSFER ------------".
-        RUN maneuverplannertransfertest.
+        RUN ManeuverPlannerTransferTest.
         WAIT_FOR_KEY().
 
         PRINT "---------------- NODE ----------------".
-        RUN nodeexecutorwrappertest.
+        RUN NodeExecutorWrapperTest.
         WAIT_FOR_KEY().
 
     } ELSE {

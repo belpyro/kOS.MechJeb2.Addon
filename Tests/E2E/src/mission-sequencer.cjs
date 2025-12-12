@@ -52,7 +52,8 @@ class MissionSequencer extends Sequencer {
 
   getTestName(path) {
     // Extract test name from path like "src/tests/circularize.test.ts"
-    const match = path.match(/\/([^/]+)\.test\.ts$/);
+    // Handle both forward slashes (Unix) and backslashes (Windows)
+    const match = path.match(/[/\\]([^/\\]+)\.test\.ts$/);
     return match ? match[1] : '';
   }
 }
