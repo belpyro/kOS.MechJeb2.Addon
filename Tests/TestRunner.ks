@@ -1,6 +1,9 @@
 // MJ_TestRunner.ks
 // Menu runner for MechJeb kOS wrapper tests using Terminal:INPUT
 
+// Ensure we're running from archive (where the test scripts are)
+SWITCH TO 0.
+
 CLEARSCREEN.
 PRINT "===============================".
 PRINT "   MechJeb kOS Tests Runner    ".
@@ -22,7 +25,7 @@ DECLARE FUNCTION WAIT_FOR_KEY {
 
 // Read a single-character menu choice using Terminal:INPUT
 DECLARE FUNCTION READ_MENU_CHOICE {
-    PARAMETER prompt IS "Enter choice (0–5): ".
+    PARAMETER prompt IS "Enter choice: ".
 
     LOCAL ti IS TERMINAL:INPUT.
     LOCAL ch IS "".
@@ -45,12 +48,18 @@ SET running TO TRUE.
 UNTIL NOT running {
 
     PRINT "".
-    PRINT "Select test suite to run (press key 0–5):".
+    PRINT "Select test suite to run:".
     PRINT "  1) Core wrapper tests".
     PRINT "  2) Vessel wrapper tests".
     PRINT "  3) Info wrapper tests".
     PRINT "  4) Ascent wrapper tests".
-    PRINT "  5) Run ALL tests (1–4)".
+    PRINT "  5) Maneuver Planner wrapper tests".
+    PRINT "  6) Basic maneuver tests".
+    PRINT "  7) Orbital geometry tests".
+    PRINT "  8) Rendezvous tests".
+    PRINT "  9) Transfer tests".
+    PRINT "  A) Node Executor wrapper tests".
+    PRINT "  B) Run ALL tests".
     PRINT "  0) Exit".
     PRINT "".
 
@@ -87,6 +96,42 @@ UNTIL NOT running {
 
     } ELSE IF choice = "5" {
         PRINT "".
+        PRINT "Running ManeuverPlanner wrapper tests...".
+        RUN ManeuverPlannerWrapperTest.
+        WAIT_FOR_KEY().
+
+    } ELSE IF choice = "6" {
+        PRINT "".
+        PRINT "Running Basic maneuver tests...".
+        RUN ManeuverPlannerBasicTest.
+        WAIT_FOR_KEY().
+
+    } ELSE IF choice = "7" {
+        PRINT "".
+        PRINT "Running Orbital geometry tests...".
+        RUN ManeuverPlannerOrbitalTest.
+        WAIT_FOR_KEY().
+
+    } ELSE IF choice = "8" {
+        PRINT "".
+        PRINT "Running Rendezvous tests...".
+        RUN ManeuverPlannerRendezvousTest.
+        WAIT_FOR_KEY().
+
+    } ELSE IF choice = "9" {
+        PRINT "".
+        PRINT "Running Transfer tests...".
+        RUN ManeuverPlannerTransferTest.
+        WAIT_FOR_KEY().
+
+    } ELSE IF choice = "A" OR choice = "a" {
+        PRINT "".
+        PRINT "Running NodeExecutor wrapper tests...".
+        RUN NodeExecutorWrapperTest.
+        WAIT_FOR_KEY().
+
+    } ELSE IF choice = "B" OR choice = "b" {
+        PRINT "".
         PRINT "Running ALL test suites...".
 
         PRINT "---------------- CORE ----------------".
@@ -105,9 +150,33 @@ UNTIL NOT running {
         RUN AscentWrapperTest.
         WAIT_FOR_KEY().
 
+        PRINT "---------------- PLANNER -------------".
+        RUN ManeuverPlannerWrapperTest.
+        WAIT_FOR_KEY().
+
+        PRINT "---------------- BASIC ---------------".
+        RUN ManeuverPlannerBasicTest.
+        WAIT_FOR_KEY().
+
+        PRINT "---------------- ORBITAL -------------".
+        RUN ManeuverPlannerOrbitalTest.
+        WAIT_FOR_KEY().
+
+        PRINT "---------------- RENDEZVOUS ----------".
+        RUN ManeuverPlannerRendezvousTest.
+        WAIT_FOR_KEY().
+
+        PRINT "---------------- TRANSFER ------------".
+        RUN ManeuverPlannerTransferTest.
+        WAIT_FOR_KEY().
+
+        PRINT "---------------- NODE ----------------".
+        RUN NodeExecutorWrapperTest.
+        WAIT_FOR_KEY().
+
     } ELSE {
         PRINT "".
-        PRINT "Unknown choice: " + choice + " (expected 0–5).".
+        PRINT "Unknown choice: " + choice + " (expected 0-9, A, B).".
         WAIT_FOR_KEY().
     }.
 }.
