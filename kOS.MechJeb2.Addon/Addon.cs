@@ -1,13 +1,8 @@
-using System;
-using System.Linq;
 using System.Reflection;
 using kOS.AddOns;
-using kOS.MechJeb2.Addon.Core;
-using kOS.MechJeb2.Addon.Utils;
 using kOS.MechJeb2.Addon.Wrapeers;
 using kOS.Safe.Encapsulation;
 using kOS.Safe.Encapsulation.Suffixes;
-using kOS.Safe.Exceptions;
 using kOS.Safe.Utilities;
 using KSPBuildTools;
 
@@ -45,6 +40,12 @@ namespace kOS.MechJeb2.Addon
             ));
             AddSuffix(new[] { "INFO" }, new NoArgsSuffix<MechJebInfoItemsWrapper>(() =>
                 MechJebController.Instance.InfoItems
+            ));
+            AddSuffix(new[] { "PLANNER", "MANEUVERPLANNER" }, new NoArgsSuffix<MechJebManeuverPlannerWrapper>(() =>
+                MechJebController.Instance.ManeuverPlanner
+            ));
+            AddSuffix(new[] { "NODE", "NODEEXECUTOR" }, new NoArgsSuffix<MechJebNodeExecutorWrapper>(() =>
+                MechJebController.Instance.NodeExecutor
             ));
             AddSuffix("VERSION",
                 new NoArgsSuffix<VersionInfo>(GetVersionInfo,
