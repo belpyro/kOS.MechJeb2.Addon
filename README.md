@@ -105,6 +105,8 @@ These suffixes are available directly on the addon and mirror the core wrapper s
 | `VESSEL`, `VESSELINFO`     | VesselStateWrapper      | Vessel flight state (altitude, speed, Q, AoA, etc.)   |
 | `INFO`                     | MechJebInfoItemsWrapper | MechJeb info items (ΔV, TWR, orbit, target, etc.)     |
 | `ASCENT`, `ASCENTGUIDANCE` | MechJebAscentWrapper    | Classic ascent autopilot settings and toggles         |
+| `PLANNER`, `MANEUVERPLANNER` | ManeuverPlannerWrapper | Maneuver node planning operations                     |
+| `NODE`, `NODEEXECUTOR`       | NodeExecutorWrapper    | Execute maneuver nodes                                |
 | `VERSION`                  | VersionInfo             | Actual plugin/addon version                           |
 
 ```ks
@@ -603,4 +605,200 @@ set asc:skipcircularization   to false.
 set asc:autowarp              to true.
 
 // Engage ascent guidance from MechJeb GUI, then let kOS tweak settings on the fly.
+```
+
+---
+
+### Maneuver planner (`ADDONS:MJ:PLANNER`)
+
+This wrapper provides access to MechJeb's maneuver planner operations for creating maneuver nodes.
+
+#### Getting the wrapper
+
+```ks
+set mj      to addons:mj.
+set planner to mj:planner.
+```
+
+---
+
+#### Utility suffixes
+
+| Suffix       | Type | Description                                   |
+|--------------|------|-----------------------------------------------|
+| `OPERATIONS` | List | List of all available MechJeb operation names |
+
+---
+
+#### Basic operations
+
+| Suffix        | Parameters                   | Description               |
+|---------------|------------------------------|---------------------------|
+| `CHANGEPE`    | altitude (m), timeRef        | Change periapsis          |
+| `CHANGEAP`    | altitude (m), timeRef        | Change apoapsis           |
+| `CIRCULARIZE` | timeRef                      | Circularize orbit         |
+| `ELLIPTICIZE` | peA (m), apA (m), timeRef    | Set both apsides          |
+| `SEMIMAJOR`   | sma (m), timeRef             | Change semi-major axis    |
+
+---
+
+#### Orbital geometry operations
+
+| Suffix        | Parameters             | Description                       |
+|---------------|------------------------|-----------------------------------|
+| `ECCENTRICITY`| ecc (0-1), timeRef     | Change eccentricity               |
+| `LONGITUDE`   | degrees, timeRef       | Change longitude of periapsis     |
+| `LAN`         | degrees, timeRef       | Change longitude of ascending node|
+
+---
+
+#### Rendezvous operations
+
+| Suffix              | Parameters             | Description                      |
+|---------------------|------------------------|----------------------------------|
+| `PLANE`             | timeRef                | Match orbital plane with target  |
+| `KILLRELVEL`        | timeRef                | Match velocity with target       |
+| `CHANGEINCLINATION` | degrees, timeRef       | Change orbital inclination       |
+| `LAMBERT`           | interval (s), timeRef  | Lambert intercept trajectory     |
+
+---
+
+#### Transfer operations
+
+| Suffix             | Parameters              | Description                                      |
+|--------------------|-------------------------|--------------------------------------------------|
+| `HOHMANN`          | timeRef, capture (bool) | Hohmann transfer to target                       |
+| `HOHMANNRENDEZVOUS`| (bool, R/W)             | Enable rendezvous targeting (default: TRUE)      |
+| `INTERPLANETARY`   | waitForPhase (bool)     | Interplanetary transfer                          |
+| `COURSECORRECTION` | peA (m)                 | Fine-tune trajectory (auto-timing)               |
+| `RESONANTORBIT`    | num, denom, timeRef     | Create resonant orbit                            |
+| `MOONRETURN`       | peA (m)                 | Return from moon orbit (auto-timing)             |
+
+---
+
+#### TimeRef values
+
+| Value             | Description                              |
+|-------------------|------------------------------------------|
+| `APOAPSIS`        | At next apoapsis                         |
+| `PERIAPSIS`       | At next periapsis                        |
+| `X_FROM_NOW`      | After specified time                     |
+| `EQ_ASCENDING`    | At equatorial ascending node             |
+| `EQ_DESCENDING`   | At equatorial descending node            |
+| `EQ_NEAREST_AD`   | At nearest equatorial node               |
+| `EQ_HIGHEST_AD`   | At highest equatorial node               |
+| `REL_ASCENDING`   | At relative ascending node (with target) |
+| `REL_DESCENDING`  | At relative descending node (with target)|
+| `REL_NEAREST_AD`  | At nearest relative node                 |
+| `REL_HIGHEST_AD`  | At highest relative node                 |
+| `CLOSEST_APPROACH`| At closest approach to target            |
+| `COMPUTED`        | MechJeb calculated optimal timing        |
+
+---
+
+#### Using X_FROM_NOW with *TIMED suffixes
+
+The `X_FROM_NOW` time reference requires specifying how many seconds in the future to execute the maneuver.
+To pass this value thread-safely, use the `*TIMED` suffix variants which accept the seconds as an additional parameter.
+
+**Basic operations (TIMED variants)**
+
+| Suffix            | Parameters                          | Description                           |
+|-------------------|-------------------------------------|---------------------------------------|
+| `CHANGEPETIMED`   | altitude (m), timeRef, seconds      | Change periapsis at X_FROM_NOW        |
+| `CHANGEAPTIMED`   | altitude (m), timeRef, seconds      | Change apoapsis at X_FROM_NOW         |
+| `CIRCULARIZETIMED`| timeRef, seconds                    | Circularize at X_FROM_NOW             |
+| `ELLIPTICIZETIMED`| peA (m), apA (m), timeRef, seconds  | Set both apsides at X_FROM_NOW        |
+| `SEMIMAJORTIMED`  | sma (m), timeRef, seconds           | Change semi-major axis at X_FROM_NOW  |
+
+**Orbital geometry operations (TIMED variants)**
+
+| Suffix             | Parameters                    | Description                               |
+|--------------------|-------------------------------|-------------------------------------------|
+| `ECCENTRICITYTIMED`| ecc (0-1), timeRef, seconds   | Change eccentricity at X_FROM_NOW         |
+
+**Rendezvous operations (TIMED variants)**
+
+| Suffix                   | Parameters                    | Description                          |
+|--------------------------|-------------------------------|--------------------------------------|
+| `KILLRELVELTIMED`        | timeRef, seconds              | Match velocity at X_FROM_NOW         |
+| `CHANGEINCLINATIONTIMED` | degrees, timeRef, seconds     | Change inclination at X_FROM_NOW     |
+| `LAMBERTTIMED`           | interval (s), timeRef, seconds| Lambert intercept at X_FROM_NOW      |
+
+**Transfer operations (TIMED variants)**
+
+| Suffix              | Parameters                       | Description                        |
+|---------------------|----------------------------------|------------------------------------|
+| `RESONANTORBITTIMED`| num, denom, timeRef, seconds     | Resonant orbit at X_FROM_NOW       |
+
+**Example: Execute maneuver 60 seconds from now**
+
+```ks
+set planner to addons:mj:planner.
+
+// Change periapsis to 80km, 60 seconds from now
+planner:changepetimed(80000, "X_FROM_NOW", 60).
+
+// Circularize 120 seconds from now
+planner:circularizetimed("X_FROM_NOW", 120).
+```
+
+---
+
+#### Example: Raise orbit and transfer to Mun
+
+```ks
+set mj      to addons:mj.
+set planner to mj:planner.
+
+// Raise apoapsis to 200km at next periapsis
+planner:changeap(200000, "PERIAPSIS").
+
+// After executing first node, circularize at apoapsis
+planner:circularize("APOAPSIS").
+
+// Hohmann transfer to Mun
+set target to mun.
+planner:hohmann("COMPUTED", false).  // false = no capture burn
+```
+
+---
+
+### Node executor (`ADDONS:MJ:NODE`)
+
+This wrapper controls MechJeb's maneuver node executor for automatic execution of planned maneuvers.
+
+#### Getting the wrapper
+
+```ks
+set mj   to addons:mj.
+set node to mj:node.
+```
+
+---
+
+#### Suffixes
+
+| Suffix     | Alias  | Type | R/W | Description                                |
+|------------|--------|------|-----|--------------------------------------------|
+| `ENABLED`  | –      | bool | R/W | Enable/disable node executor               |
+| `AUTOWARP` | `WARP` | bool | R/W | Enable automatic time warp to maneuver node|
+
+---
+
+#### Example: Execute a maneuver node
+
+```ks
+set mj   to addons:mj.
+set node to mj:node.
+
+// Configure executor
+set node:autowarp to true.
+
+// Start executing the next maneuver node
+set node:enabled to true.
+
+// Wait for burn to complete
+wait until not node:enabled.
+print "Maneuver complete!".
 ```
