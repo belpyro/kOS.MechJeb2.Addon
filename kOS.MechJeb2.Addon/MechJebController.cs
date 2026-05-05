@@ -19,6 +19,7 @@ namespace kOS.MechJeb2.Addon
                 { WrapperTypes.Info, new MechJebInfoItemsWrapper() },
                 { WrapperTypes.Planner, new MechJebManeuverPlannerWrapper() },
                 { WrapperTypes.Node, new MechJebNodeExecutorWrapper() },
+                { WrapperTypes.StageStats, new MechJebStageStatsWrapper() },
             };
             foreach (var baseWrapper in _wrappers)
             {
@@ -38,6 +39,7 @@ namespace kOS.MechJeb2.Addon
         public MechJebInfoItemsWrapper InfoItems => _wrappers[WrapperTypes.Info] as MechJebInfoItemsWrapper;
         public MechJebManeuverPlannerWrapper ManeuverPlanner => _wrappers[WrapperTypes.Planner] as MechJebManeuverPlannerWrapper;
         public MechJebNodeExecutorWrapper NodeExecutor => _wrappers[WrapperTypes.Node] as MechJebNodeExecutorWrapper;
+        public MechJebStageStatsWrapper StageStats => _wrappers[WrapperTypes.StageStats] as MechJebStageStatsWrapper;
     }
 
     internal enum WrapperTypes
@@ -47,6 +49,7 @@ namespace kOS.MechJeb2.Addon
         Ascent,
         Core,
         Planner,
-        Node
+        Node,
+        StageStats
     }
 }
