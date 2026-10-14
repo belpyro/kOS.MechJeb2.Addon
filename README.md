@@ -438,7 +438,7 @@ set asc to mj:ascent.
 | Suffix       | Alias    | Type   | R/W | Description                                      |
 |--------------|----------|--------|-----|--------------------------------------------------|
 | `ENABLED`    | –        | bool   | R/W | Enable/disable MechJeb ascent autopilot.        |
-| `ASCENTTYPE` | `ASCTYPE`| string | R   | Ascent mode (`CLASSIC` or `NOT SUPPORTED`).     |
+| `ASCENTTYPE` | `ASCTYPE`| string | R/W | Ascent type, `CLASSIC` or `PSG` (case-insensitive when set). Setting it disengages the ascent autopilot of the other type. |
 
 ---
 

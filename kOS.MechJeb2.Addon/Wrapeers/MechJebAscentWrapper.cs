@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using kOS.MechJeb2.Addon.Attributes;
 using kOS.MechJeb2.Addon.Core;
 using kOS.MechJeb2.Addon.Utils;
@@ -62,7 +64,10 @@ namespace kOS.MechJeb2.Addon.Wrapeers
             GetAutoPath = Member(ascentSettings, "AutoPath").GetField<bool>();
             SetAutoPath = Member(ascentSettings, "AutoPath").SetField<bool>();
 
-            GetAscentTypeInteger = Member(ascentSettings, "AscentTypeInteger").GetField<int>();
+            // The AscentType property setter also disables the ascent autopilot of the other type.
+            _ascentTypeEnum = ascentSettings.GetType().GetProperty("AscentType")!.PropertyType;
+            GetAscentType = Member(ascentSettings, "AscentType").GetProp<object>();
+            SetAscentType = Member(ascentSettings, "AscentType").SetProp<object>();
 
             (GetTurnStartAltitudeDouble, SetTurnStartAltitude) =
                 BindEditable<double>(ascentSettings, "TurnStartAltitude");
@@ -194,7 +199,8 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                 new SetSuffix<BooleanValue>(() => GetAutostage(AscentSettings),
                     value => SetAutostage(AscentSettings, value), "Auto Stage Status"));
             AddSuffix(new[] { "ASCENTTYPE", "ASCTYPE" },
-                new NoArgsSuffix<StringValue>(() => AscentType == 0 ? "CLASSIC" : "NOT SUPPORTED"));
+                new SetSuffix<StringValue>(() => AscentType, value => AscentType = value,
+                    "Ascent type, \"CLASSIC\" or \"PSG\". Setting it disengages the ascent autopilot of the other type."));
             AddSuffix(new[] { "AUTODEPLOYANTENNAS", "AUTODANT" },
                 new SetSuffix<BooleanValue>(() => GetAutoDeployAntennas(AscentSettings),
                     value => SetAutoDeployAntennas(AscentSettings, value),
@@ -393,7 +399,29 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         }
 
 
-        public int AscentType => GetAscentTypeInteger(AscentSettings);
+        public StringValue AscentType
+        {
+            get => GetAscentType(AscentSettings).ToString();
+            set
+            {
+                var name = value.ToString().Trim().ToUpperInvariant();
+                if (!Enum.GetNames(_ascentTypeEnum).Contains(name))
+                    throw new KOSException(
+                        $"Unknown ascent type '{value}', expected one of {string.Join(", ", Enum.GetNames(_ascentTypeEnum))}");
+
+                SetAscentType(AscentSettings, Enum.Parse(_ascentTypeEnum, name));
+                SyncAscentMenu(name == "PSG");
+            }
+        }
+
+        // MechJeb2's own kOS binding also sets this so the ascent window reopens with the matching settings window.
+        private void SyncAscentMenu(bool psg)
+        {
+            var menu = MasterMechJeb.GetType().GetMethod("GetComputerModule", new[] { typeof(string) })
+                ?.Invoke(MasterMechJeb, new object[] { "MechJebModuleAscentMenu" });
+            menu?.GetType().GetField("_lastPSGSettingsEnabled", BindingFlags.Instance | BindingFlags.Public)
+                ?.SetValue(menu, psg);
+        }
 
         private Func<object, bool> GetEnabled { get; set; }
         private Action<object, bool> SetEnabled { get; set; }
@@ -405,7 +433,9 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         private Func<object, bool> GetAutoPath { get; set; }
         private Action<object, bool> SetAutoPath { get; set; }
 
-        private Func<object, int> GetAscentTypeInteger { get; set; }
+        private Type _ascentTypeEnum;
+        private Func<object, object> GetAscentType { get; set; }
+        private Action<object, object> SetAscentType { get; set; }
 
         public Action<object, bool> SetAutoWarp { get; set; }
 
