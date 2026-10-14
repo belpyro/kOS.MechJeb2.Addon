@@ -541,7 +541,10 @@ set asc to mj:ascent.
 | `HOTSTAGING`         | `HOTSTAGE` | bool   | R/W | Enable hot staging.                              |
 | `HOTSTAGINGLEADTIME` | `HOTLEAD`  | number | R/W | Hot staging lead time (seconds).                 |
 | `DROPSOLIDS`         | `DRPSLD`   | bool   | R/W | Enable dropping of solid boosters.               |
+| `DROPSOLIDSTWRPCT`   | `SLDSTWR`  | number | R/W | Drop solids when their acceleration falls to this fraction (0-1) of the rocket's. |
 | `DROPSOLIDSLEADTIME` | `SLDSLEAD` | number | R/W | Lead time before dropping solids (seconds).      |
+
+MechJeb2 has only one of the last two settings: `DROPSOLIDSTWRPCT` in current versions (2.15.3.0 and later), `DROPSOLIDSLEADTIME` in older ones. Only the one it has is registered, so use `asc:HASSUFFIX("DROPSOLIDSTWRPCT")` to tell which.
 
 ---
 

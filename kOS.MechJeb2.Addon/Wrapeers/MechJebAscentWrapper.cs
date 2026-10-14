@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using kOS.MechJeb2.Addon.Attributes;
 using kOS.MechJeb2.Addon.Core;
 using kOS.MechJeb2.Addon.Utils;
@@ -107,8 +108,15 @@ namespace kOS.MechJeb2.Addon.Wrapeers
             GetDropSolids = Member(stagingController, "DropSolids").GetField<bool>();
             SetDropSolids = Member(stagingController, "DropSolids").SetField<bool>();
 
-            (GetDropSolidsLeadTime, SetDropSolidsLeadTime) =
-                BindEditable<double>(stagingController, "DropSolidsLeadTime");
+            // MechJeb2 replaced DropSolidsLeadTime (seconds) with DropSolidsTwrPct (fraction of the rocket's
+            // thrust acceleration) in a0ae7edd, included in 2.15.3.0. Bind whichever this MechJeb2 has.
+            if (stagingController.GetType().GetField("DropSolidsTwrPct",
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) != null)
+                (GetDropSolidsTwrPct, SetDropSolidsTwrPct) =
+                    BindEditable<double>(stagingController, "DropSolidsTwrPct");
+            else
+                (GetDropSolidsLeadTime, SetDropSolidsLeadTime) =
+                    BindEditable<double>(stagingController, "DropSolidsLeadTime");
             (GetClampAutoStageThrustPct, SetClampAutoStageThrustPct) =
                 BindEditable<double>(stagingController, "ClampAutoStageThrustPct");
 
@@ -264,11 +272,20 @@ namespace kOS.MechJeb2.Addon.Wrapeers
                     () => GetDropSolids(StagingController),
                     value => SetDropSolids(StagingController, value),
                     "Enable dropping of solid boosters"));
-            AddSuffix(new[] { "DROPSOLIDSLEADTIME", "SLDSLEAD" },
-                new SetSuffix<ScalarDoubleValue>(
-                    () => GetDropSolidsLeadTime(StagingController),
-                    value => SetDropSolidsLeadTime(StagingController, value),
-                    "Lead time before dropping solids (seconds)"));
+            // Only the drop solids setting this MechJeb2 has is registered, so scripts can check HASSUFFIX.
+            if (GetDropSolidsTwrPct != null)
+                AddSuffix(new[] { "DROPSOLIDSTWRPCT", "SLDSTWR" },
+                    new ClampSetSuffix<ScalarDoubleValue>(
+                        () => GetDropSolidsTwrPct(StagingController),
+                        value => SetDropSolidsTwrPct(StagingController, value),
+                        min: 0, max: 1, stepIncrement: 0f,
+                        "Drop solids when their acceleration falls to this fraction of the rocket's"));
+            else
+                AddSuffix(new[] { "DROPSOLIDSLEADTIME", "SLDSLEAD" },
+                    new SetSuffix<ScalarDoubleValue>(
+                        () => GetDropSolidsLeadTime(StagingController),
+                        value => SetDropSolidsLeadTime(StagingController, value),
+                        "Lead time before dropping solids (seconds)"));
 
             // Clamp AutoStage thrust percent
             AddSuffix(new[] { "CLAMPAUTOSTAGETHRUSTPCT", "CLAMPTHRUST" },
@@ -480,9 +497,13 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         public Func<object, double> GetHotStagingLeadTime { get; set; }
         public Action<object, double> SetHotStagingLeadTime { get; set; }
 
-        // Drop solids (bool DropSolids + EditableDouble DropSolidsLeadTime)
+        // Drop solids (bool DropSolids + EditableDoubleMult DropSolidsTwrPct, or EditableDouble
+        // DropSolidsLeadTime in older MechJeb2)
         public Func<object, bool> GetDropSolids { get; set; }
         public Action<object, bool> SetDropSolids { get; set; }
+
+        public Func<object, double> GetDropSolidsTwrPct { get; set; }
+        public Action<object, double> SetDropSolidsTwrPct { get; set; }
 
         public Func<object, double> GetDropSolidsLeadTime { get; set; }
         public Action<object, double> SetDropSolidsLeadTime { get; set; }
