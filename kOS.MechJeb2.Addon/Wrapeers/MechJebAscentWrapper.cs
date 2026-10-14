@@ -538,19 +538,21 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         //Helpers
         private (Func<object, T> get, Action<object, T> set)
             BindEditable<T>(object settings, string fieldName)
-        {
-            var fieldCtx = Reflect.On(settings).Field(fieldName);
+            => BindOrMissing<(Func<object, T>, Action<object, T>)>(settings, fieldName, () =>
+                {
+                    var fieldCtx = Reflect.On(settings).Field(fieldName);
 
-            var getterObj = fieldCtx.AsGetter<object>();
-            var getterDouble = Reflect.On(getterObj(settings))
-                .Property(Constants.EditableDoubleValueName)
-                .AsGetter<T>();
+                    var getterObj = fieldCtx.AsGetter<object>();
+                    var getterDouble = Reflect.On(getterObj(settings))
+                        .Property(Constants.EditableDoubleValueName)
+                        .AsGetter<T>();
 
-            var setVal = Reflect.On(getterObj(settings))
-                .Property(Constants.EditableDoubleValueName)
-                .AsSetter<T>();
+                    var setVal = Reflect.On(getterObj(settings))
+                        .Property(Constants.EditableDoubleValueName)
+                        .AsSetter<T>();
 
-            return (ctx => getterDouble(getterObj(ctx)), (ctx, val) => setVal(getterObj(ctx), val));
-        }
+                    return (ctx => getterDouble(getterObj(ctx)), (ctx, val) => setVal(getterObj(ctx), val));
+                },
+                error => (_ => throw new KOSException(error), (_, __) => throw new KOSException(error)));
     }
 }
