@@ -258,15 +258,23 @@ PRINT "AUTOSTAGE tests done.".
 PRINT "-------------------------------".
 
 // -----------------------------------------------------------------------------
-// Test: ASCENTTYPE / ASCTYPE (read-only)
+// Test: ASCENTTYPE / ASCTYPE
 // -----------------------------------------------------------------------------
-PRINT "TEST: ASCENTTYPE / ASCTYPE (read-only)".
+PRINT "TEST: ASCENTTYPE / ASCTYPE".
 
-// currently AscentType == 0 => "CLASSIC" or "NOT SUPPORTED"
- ASSERT_EQ("ASCENTTYPE equals alias ASCTYPE", asc:ASCENTTYPE, asc:ASCTYPE).
+ASSERT_EQ("ASCENTTYPE equals alias ASCTYPE", asc:ASCENTTYPE, asc:ASCTYPE).
 
-// just verify that the current string is not empty
- ASSERT_EQ("ASCENTTYPE not empty", TRUE, (asc:ASCENTTYPE <> "")).
+SET asc:ASCENTTYPE TO "psg".
+WAIT 0.1.
+ASSERT_EQ("ASCENTTYPE set PSG", "PSG", asc:ASCENTTYPE).
+
+SET asc:ASCTYPE TO "CLASSIC".
+WAIT 0.1.
+ASSERT_EQ("ASCTYPE set CLASSIC", "CLASSIC", asc:ASCENTTYPE).
+
+SET asc:ASCENTTYPE TO origAscentTypeString.
+WAIT 0.1.
+ASSERT_EQ("ASCENTTYPE restored", origAscentTypeString, asc:ASCENTTYPE).
 
 PRINT "ASCENTTYPE tests done.".
 PRINT "-------------------------------".
