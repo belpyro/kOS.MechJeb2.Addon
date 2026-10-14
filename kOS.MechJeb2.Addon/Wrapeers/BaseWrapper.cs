@@ -85,6 +85,27 @@ namespace kOS.MechJeb2.Addon.Wrapeers
         protected MemberBinder Member(object target, string name)
             => new MemberBinder(target, name);
 
+        /// <summary>
+        /// Runs <paramref name="bind"/>, and if the MechJeb2 member it needs does not exist, logs a warning and
+        /// returns <paramref name="missing"/> built with an error message instead. Suffixes bound to the fallback
+        /// fail with that message when used, so a member renamed or removed in another MechJeb2 version disables
+        /// only the suffixes that use it instead of the whole wrapper.
+        /// </summary>
+        protected static TResult BindOrMissing<TResult>(object target, string name, Func<TResult> bind,
+            Func<string, TResult> missing)
+        {
+            try
+            {
+                return bind();
+            }
+            catch (MissingMemberException)
+            {
+                var member = $"{target.GetType().FullName}.{name}";
+                Log.Warning($"{member} not found, suffixes that use it are disabled");
+                return missing($"{member} is not available in the installed MechJeb2 version");
+            }
+        }
+
         protected class MemberBinder
         {
             private readonly object _target;
@@ -97,16 +118,24 @@ namespace kOS.MechJeb2.Addon.Wrapeers
             }
 
             public Func<object, T> GetField<T>()
-                => Reflect.On(_target).Field(_name).AsGetter<T>();
+                => BindOrMissing(_target, _name, () => Reflect.On(_target).Field(_name).AsGetter<T>(),
+                    Getter<T>);
 
             public Action<object, T> SetField<T>()
-                => Reflect.On(_target).Field(_name).AsSetter<T>();
+                => BindOrMissing(_target, _name, () => Reflect.On(_target).Field(_name).AsSetter<T>(),
+                    Setter<T>);
 
             public Func<object, T> GetProp<T>()
-                => Reflect.On(_target).Property(_name).AsGetter<T>();
+                => BindOrMissing(_target, _name, () => Reflect.On(_target).Property(_name).AsGetter<T>(),
+                    Getter<T>);
 
             public Action<object, T> SetProp<T>()
-                => Reflect.On(_target).Property(_name).AsSetter<T>();
+                => BindOrMissing(_target, _name, () => Reflect.On(_target).Property(_name).AsSetter<T>(),
+                    Setter<T>);
+
+            private static Func<object, T> Getter<T>(string error) => _ => throw new KOSException(error);
+
+            private static Action<object, T> Setter<T>(string error) => (_, __) => throw new KOSException(error);
         }
     }
 }
