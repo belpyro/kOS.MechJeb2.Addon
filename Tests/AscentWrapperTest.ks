@@ -58,7 +58,12 @@ SET origFairingMaxAerothermalFlux TO asc:FAIRINGMAXAEROTHERMALFLUX.
 SET origHotStaging TO asc:HOTSTAGING.
 SET origHotStagingLeadTime TO asc:HOTSTAGINGLEADTIME.
 SET origDropSolids TO asc:DROPSOLIDS.
-SET origDropSolidsLeadTime TO asc:DROPSOLIDSLEADTIME.
+SET hasDropSolidsTwrPct TO asc:HASSUFFIX("DROPSOLIDSTWRPCT").
+IF hasDropSolidsTwrPct {
+    SET origDropSolidsTwrPct TO asc:DROPSOLIDSTWRPCT.
+} ELSE {
+    SET origDropSolidsLeadTime TO asc:DROPSOLIDSLEADTIME.
+}
 SET origClampAutoStageThrustPct TO asc:CLAMPAUTOSTAGETHRUSTPCT.
 SET origDesiredInclination TO asc:DESIREDINCLINATION.
 SET origCorrectiveSteering TO asc:CORRECTIVESTEERING.
@@ -457,27 +462,54 @@ ASSERT_EQ("HOTSTAGINGLEADTIME restored", origHotStagingLeadTime, asc:HOTSTAGINGL
 PRINT "HOTSTAGING tests done.".
 PRINT "-------------------------------".
 // -----------------------------------------------------------------------------
-// Test: DROPSOLIDS / DROPSOLIDSLEADTIME
+// Test: DROPSOLIDS / DROPSOLIDSTWRPCT (clamp 0..1), or DROPSOLIDSLEADTIME on
+// older MechJeb2
 // -----------------------------------------------------------------------------
-PRINT "TEST: DROPSOLIDS + DROPSOLIDSLEADTIME".
+PRINT "TEST: DROPSOLIDS + DROPSOLIDSTWRPCT or DROPSOLIDSLEADTIME".
+ASSERT_EQ("exactly one drop solids setting", NOT hasDropSolidsTwrPct, asc:HASSUFFIX("DROPSOLIDSLEADTIME")).
 
 SET asc:DROPSOLIDS TO NOT origDropSolids.
 WAIT 0.1.
 
 ASSERT_EQ("DROPSOLIDS toggled", NOT origDropSolids, asc:DROPSOLIDS).
 
-SET newDropLead TO origDropSolidsLeadTime + 0.5.
-SET asc:DROPSOLIDSLEADTIME TO newDropLead.
-WAIT 0.1.
+IF hasDropSolidsTwrPct {
+    SET asc:DROPSOLIDSTWRPCT TO 0.37.
+    WAIT 0.1.
 
-ASSERT_EQ("DROPSOLIDSLEADTIME set", newDropLead, asc:DROPSOLIDSLEADTIME).
+    ASSERT_EQ("DROPSOLIDSTWRPCT set mid", 0.37, asc:DROPSOLIDSTWRPCT).
+    ASSERT_EQ("SLDSTWR alias matches", asc:DROPSOLIDSTWRPCT, asc:SLDSTWR).
+
+    SET asc:DROPSOLIDSTWRPCT TO -1.
+    WAIT 0.1.
+
+    ASSERT_EQ("DROPSOLIDSTWRPCT clamp low", 0, asc:DROPSOLIDSTWRPCT).
+
+    SET asc:DROPSOLIDSTWRPCT TO 2.
+    WAIT 0.1.
+
+    ASSERT_EQ("DROPSOLIDSTWRPCT clamp high", 1, asc:DROPSOLIDSTWRPCT).
+
+    SET asc:DROPSOLIDSTWRPCT TO origDropSolidsTwrPct.
+} ELSE {
+    SET newDropLead TO origDropSolidsLeadTime + 0.5.
+    SET asc:DROPSOLIDSLEADTIME TO newDropLead.
+    WAIT 0.1.
+
+    ASSERT_EQ("DROPSOLIDSLEADTIME set", newDropLead, asc:DROPSOLIDSLEADTIME).
+
+    SET asc:DROPSOLIDSLEADTIME TO origDropSolidsLeadTime.
+}
 
 SET asc:DROPSOLIDS TO origDropSolids.
-SET asc:DROPSOLIDSLEADTIME TO origDropSolidsLeadTime.
 WAIT 0.1.
 
 ASSERT_EQ("DROPSOLIDS restored", origDropSolids, asc:DROPSOLIDS).
-ASSERT_EQ("DROPSOLIDSLEADTIME restored", origDropSolidsLeadTime, asc:DROPSOLIDSLEADTIME).
+IF hasDropSolidsTwrPct {
+    ASSERT_EQ("DROPSOLIDSTWRPCT restored", origDropSolidsTwrPct, asc:DROPSOLIDSTWRPCT).
+} ELSE {
+    ASSERT_EQ("DROPSOLIDSLEADTIME restored", origDropSolidsLeadTime, asc:DROPSOLIDSLEADTIME).
+}
 
 PRINT "DROPSOLIDS tests done.".
 PRINT "-------------------------------".
